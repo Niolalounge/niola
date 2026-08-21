@@ -26,6 +26,27 @@ export async function loadMenu() {
   }))
 }
 
+/**
+ * Calls back whenever anything in the menu changes, including edits made by another
+ * administrator or straight from the Supabase dashboard.
+ *
+ * Watches content_revision rather than menu_products: an administrator can read every row, but
+ * the counter is one event per statement instead of one per changed row, so a bulk edit does not
+ * fan out into dozens of refetches.
+ */
+export function subscribeToMenuChanges(onChange) {
+  const channel = adminClient
+    .channel('niola-admin-content')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'content_revision' },
+      () => onChange(),
+    )
+    .subscribe()
+
+  return () => { adminClient.removeChannel(channel) }
+}
+
 export async function updateProduct(id, changes) {
   const { data, error } = await adminClient
     .from('menu_products')

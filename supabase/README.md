@@ -17,8 +17,26 @@ picks one by the active language.
 
 ## Editing content
 
-Use the Supabase dashboard's table editor. The site picks changes up on the next page load; there
-is no build step and nothing to redeploy.
+Use the dashboard at `/admin`, or Supabase's own table editor. Either way the change reaches pages
+that are **already open** within about ten seconds — no reload, no build step, nothing to redeploy.
+
+How that works, and why it is not a websocket on the public site:
+
+Every write to `menu_categories`, `menu_products` or `gallery_items` fires a statement-level
+trigger that increments a counter in `content_revision`. Open pages watch that counter and refetch
+when it moves.
+
+The counter exists because the obvious approach has a hole. Realtime applies RLS per subscriber,
+so hiding a product produces an UPDATE whose new row an anonymous visitor is not allowed to see —
+no event is delivered, and the product stays on their screen. The one change most worth pushing is
+the one that would silently fail. `content_revision` is readable by everyone, so the signal always
+arrives, and the client then refetches through its normal RLS-filtered query.
+
+The public site polls that counter every ten seconds while the tab is visible, rather than opening
+a websocket: `@supabase/supabase-js` is ~54 kB gzipped, and making every visitor download it to
+learn about a price change a few times a week is a bad trade — one 150-byte request is not. The
+`/admin` dashboard, which already loads the library to sign in, does use the websocket, so two
+administrators see each other's edits immediately.
 
 - **Hide an item** — set `is_published = false`. It stays in the table with its price.
 - **Publish an item** — it needs `image_url`, `image_width` and `image_height` first. A constraint
@@ -49,6 +67,8 @@ PostgREST reads and writes rows but has no `CREATE TABLE`.
 | `migrations/0001_schema.sql` | Tables, constraints, indexes, RLS policies, `updated_at` trigger |
 | `migrations/0002_seed_content.sql` | The content, generated — do not edit by hand |
 | `migrations/0003_harden.sql` | Narrows anon to `SELECT`; one gallery photo per grid slot |
+| `migrations/0004_admin.sql` | `admin_users`, write policies for administrators, the image bucket |
+| `migrations/0005_realtime.sql` | `content_revision` and the triggers that drive live updates |
 
 ## Regenerating the seed after editing `src/data`
 

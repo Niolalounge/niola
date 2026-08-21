@@ -6,6 +6,7 @@ import {
   deleteProduct,
   loadMenu,
   setProductImage,
+  subscribeToMenuChanges,
   updateProduct,
 } from '../lib/adminApi'
 
@@ -411,6 +412,23 @@ function Dashboard({ email }) {
   }, [])
 
   useEffect(load, [load])
+
+  // Another administrator — or someone editing straight from the Supabase dashboard — should not
+  // leave this screen showing stale prices.
+  useEffect(() => {
+    let timer = null
+    const unsubscribe = subscribeToMenuChanges(() => {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        // Every one of this tab's own saves also bumps the revision. Refetching while a field is
+        // focused would yank the value out from under whoever is typing in it.
+        const editing = document.activeElement
+        if (editing?.tagName === 'INPUT' && editing.closest('.admin-panel, .admin-dialog')) return
+        load()
+      }, 900)
+    })
+    return () => { clearTimeout(timer); unsubscribe() }
+  }, [load])
 
   const replaceProduct = useCallback((updated) => {
     if (!updated) return

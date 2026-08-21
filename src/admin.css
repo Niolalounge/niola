@@ -321,30 +321,102 @@
   .admin-sidebar button { white-space: nowrap; }
 }
 
+/* Below this width the table stops being a table: each product becomes a card, because six
+   columns cannot be scanned on a phone and a 44px tap target does not fit in a table cell. */
 @media (max-width: 680px) {
-  .admin-table thead { display: none; }
-  .admin-table, .admin-table tbody, .admin-table tr { display: block; }
-  .admin-table tr {
-    position: relative;
-    display: grid; gap: 0.4rem 0.7rem;
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-    align-items: center;
-    padding: 0.7rem 0.2rem;
-    border-bottom: 1px solid rgba(216, 179, 106, 0.12);
-  }
-  .admin-table td { display: block; border: 0; padding: 0; }
-  .admin-cell-photo { grid-row: span 2; width: auto; }
-  .admin-cell-name { grid-column: 2; }
-  .admin-cell-remove { grid-column: 3; grid-row: 1; width: auto; justify-self: end; }
-  .admin-cell-price { grid-column: 2; width: auto; }
-  .admin-cell-visible { grid-column: 3; width: auto; justify-self: end; }
-  .admin-cell-state { grid-column: 2 / -1; width: auto; }
+  .admin-page { padding: 1rem 0.75rem 4rem; }
+
   .admin-toolbar { flex-direction: column; align-items: stretch; }
   /* `flex: 1 1 14rem` is a width in the row layout; once the toolbar stacks, the same
      declaration becomes a 14rem *height* and opens a chasm around the search box. */
   .admin-search { flex: 0 0 auto; }
+  .admin-search input { padding-block: 0.7rem; font-size: 1rem; }
   .admin-filters { justify-content: space-between; }
-  .admin-stats { grid-template-columns: repeat(2, 1fr); }
-  .admin-add-button { justify-content: center; }
+  .admin-filters button { flex: 1; padding-block: 0.55rem; text-align: center; }
+
+  /* Four stacked cards pushed the first product two screens down. On a phone the counters are
+     reference, not the reason you opened the page, so they collapse into one compact strip. */
+  .admin-header { padding-bottom: 0.7rem; }
+  .admin-stats {
+    display: flex; gap: 0.4rem; margin: 0.7rem 0 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .admin-stats::-webkit-scrollbar { display: none; }
+  .admin-stat {
+    flex: none; display: flex; align-items: baseline; gap: 0.3rem;
+    padding: 0.35rem 0.6rem; border-radius: 999px;
+  }
+  .admin-stat strong { font-size: 0.9rem; }
+  .admin-stat span { font-size: 0.68rem; }
+
+  .admin-sidebar { padding: 0.5rem; }
+  .admin-sidebar__title { display: none; }
+  .admin-sidebar button { padding: 0.45rem 0.7rem; }
+  .admin-add-button { justify-content: center; padding-block: 0.7rem; font-size: 0.88rem; }
   .admin-dialog__grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-dialog { width: calc(100vw - 1.5rem); }
+  .admin-dialog__body { padding: 1rem; }
+  .admin-dialog :is(input, select) { padding-block: 0.7rem; font-size: 1rem; }
+  .admin-dialog__actions button[type='submit'] { flex: 1; padding-block: 0.8rem; }
+
+  .admin-panel { padding: 0.7rem; background: none; border: 0; }
+  .admin-toolbar { border-bottom: 0; padding-bottom: 0; }
+
+  .admin-table thead { display: none; }
+  .admin-table, .admin-table tbody { display: block; }
+
+  .admin-table tr {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'photo name   remove'
+      'photo price  toggle';
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    padding: 0.75rem;
+    border: 1px solid var(--admin-line);
+    border-radius: 12px;
+    background: var(--admin-surface);
+  }
+  .admin-table tbody tr:hover { background: var(--admin-surface); }
+  .admin-table tr.is-hidden-row { background: rgba(30, 23, 18, 0.5); border-style: dashed; }
+
+  .admin-table td { display: block; border: 0; padding: 0; width: auto; }
+
+  .admin-cell-photo { grid-area: photo; align-self: start; }
+  .admin-thumb { width: 56px; height: 56px; }
+  /* There is no hover on a touch screen, so the change-photo hint has to be permanent. */
+  .admin-thumb__overlay {
+    inset: auto 0 0 0; height: 1.05rem; opacity: 1;
+    background: rgba(9, 7, 6, 0.78); font-size: 0.5rem; align-content: center;
+  }
+
+  .admin-cell-name { grid-area: name; }
+  .admin-cell-name strong { font-size: 0.95rem; }
+
+  .admin-cell-price { grid-area: price; }
+  .admin-field input[type='number'] { width: 4.6rem; padding-block: 0.55rem; font-size: 0.95rem; }
+
+  .admin-cell-visible { grid-area: toggle; justify-self: end; }
+  /* Comfortably tappable without moving the label. */
+  .admin-switch { padding: 0.6rem 0; }
+  .admin-switch__track { width: 2.4rem; height: 1.35rem; }
+  .admin-switch__track > span { width: 1rem; height: 1rem; }
+  .admin-switch.is-on .admin-switch__track > span { transform: translateX(-1.05rem); }
+
+  .admin-cell-remove { grid-area: remove; justify-self: end; align-self: start; }
+  .admin-cell-remove .admin-icon-button { width: 2.5rem; height: 2.5rem; border-color: var(--admin-line); }
+
+  /* The save indicator would add a row to every card and jump the layout, so it floats. */
+  .admin-cell-state {
+    position: fixed; inset-block-end: 1rem; inset-inline: 0;
+    display: grid; justify-items: center; pointer-events: none; z-index: 5;
+  }
+  .admin-cell-state:empty { display: none; }
+  .admin-cell-state > * {
+    padding: 0.45rem 0.9rem; border-radius: 999px;
+    background: var(--admin-surface-raised); border: 1px solid var(--admin-line-strong);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
 }
