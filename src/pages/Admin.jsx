@@ -27,6 +27,9 @@ const text = {
   visible: 'ظاهر',
   hidden: 'مخفي',
   addProduct: 'إضافة منتج',
+  category: 'التصنيف',
+  willPublish: 'سيُضاف ويظهر على الموقع مباشرة.',
+  willStayHidden: 'بدون صورة سيُضاف مخفياً — يمكنك إظهاره بعد رفع صورته.',
   nameAr: 'الاسم بالعربية',
   nameEn: 'الاسم بالإنجليزية',
   save: 'حفظ',
@@ -271,8 +274,17 @@ function ProductRow({ product, categoryName, onChange, onRemove }) {
   )
 }
 
-function AddProduct({ categoryId, categoryName, onCreated }) {
-  const [open, setOpen] = useState(false)
+/**
+ * Adding a product is a modal rather than a panel under the list: the button lives in the toolbar
+ * now, so it is reachable without scrolling past 32 rows, and a category no longer has to be on
+ * screen for it to work — the form carries its own category picker.
+ *
+ * Built on <dialog> so focus trapping, Escape, inertness of the page behind it, and the backdrop
+ * all come from the browser instead of being re-implemented.
+ */
+function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCreated }) {
+  const dialogRef = useRef(null)
+  const [categoryId, setCategoryId] = useState(defaultCategoryId)
   const [nameAr, setNameAr] = useState('')
   const [nameEn, setNameEn] = useState('')
   const [price, setPrice] = useState('')
@@ -280,7 +292,17 @@ function AddProduct({ categoryId, categoryName, onCreated }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
-  const reset = () => { setNameAr(''); setNameEn(''); setPrice(''); setFile(null); setError(null) }
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    if (open && !dialog.open) {
+      setCategoryId(defaultCategoryId)
+      setNameAr(''); setNameEn(''); setPrice(''); setFile(null); setError(null)
+      dialog.showModal()
+    } else if (!open && dialog.open) {
+      dialog.close()
+    }
+  }, [open, defaultCategoryId])
 
   const submit = async (event) => {
     event.preventDefault()
@@ -294,54 +316,70 @@ function AddProduct({ categoryId, categoryName, onCreated }) {
         price: Number(price),
         file,
       })
-      onCreated(created)
+      onCreated(categoryId, created)
+      // A failed upload still leaves a usable draft, so the dialog stays open to say so.
       if (created.uploadError) setError(created.uploadError)
-      else { reset(); setOpen(false) }
+      else onClose()
     } catch (cause) {
       setError(cause.message)
     }
     setBusy(false)
   }
 
-  if (!open) {
-    return (
-      <button type="button" className="admin-add-trigger" onClick={() => setOpen(true)}>
-        <span aria-hidden="true">+</span> {text.addProduct} — {categoryName}
-      </button>
-    )
-  }
-
   return (
-    <form className="admin-add" onSubmit={submit}>
-      <p className="admin-add__title">{text.addProduct} — {categoryName}</p>
-      <div className="admin-add__grid">
-        <label>
-          <span>{text.nameAr}</span>
-          <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required />
-        </label>
-        <label>
-          <span>{text.nameEn}</span>
-          <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" />
-        </label>
-        <label>
-          <span>{text.price}</span>
-          <input type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} required dir="ltr" />
-        </label>
-        <label>
-          <span>{text.photo}</span>
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/avif"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </label>
-      </div>
-      {error && <p className="admin-error" role="alert">{error}</p>}
-      <div className="admin-add__actions">
-        <button type="submit" disabled={busy}>{busy ? text.saving : text.save}</button>
-        <button type="button" className="admin-link" onClick={() => { reset(); setOpen(false) }}>{text.cancel}</button>
-      </div>
-    </form>
+    <dialog
+      ref={dialogRef}
+      className="admin-dialog"
+      onClose={onClose}
+      onClick={(event) => { if (event.target === dialogRef.current) onClose() }}
+      aria-labelledby="admin-dialog-title"
+    >
+      <form className="admin-dialog__body" onSubmit={submit}>
+        <header className="admin-dialog__head">
+          <h2 id="admin-dialog-title">{text.addProduct}</h2>
+          <button type="button" className="admin-icon-button" onClick={onClose} aria-label={text.cancel}>✕</button>
+        </header>
+
+        <div className="admin-dialog__grid">
+          <label className="admin-dialog__wide">
+            <span>{text.category}</span>
+            <select value={categoryId ?? ''} onChange={(e) => setCategoryId(e.target.value)} required>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name_ar}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>{text.nameAr}</span>
+            <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required autoFocus />
+          </label>
+          <label>
+            <span>{text.nameEn}</span>
+            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" />
+          </label>
+          <label>
+            <span>{text.price}</span>
+            <input type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} required dir="ltr" />
+          </label>
+          <label>
+            <span>{text.photo}</span>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/avif"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+        </div>
+
+        <p className="admin-dialog__note">{file ? text.willPublish : text.willStayHidden}</p>
+        {error && <p className="admin-error" role="alert">{error}</p>}
+
+        <div className="admin-dialog__actions">
+          <button type="submit" disabled={busy}>{busy ? text.saving : text.save}</button>
+          <button type="button" className="admin-link" onClick={onClose}>{text.cancel}</button>
+        </div>
+      </form>
+    </dialog>
   )
 }
 
@@ -360,6 +398,7 @@ function Dashboard({ email }) {
   const [activeId, setActiveId] = useState(null)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
+  const [adding, setAdding] = useState(false)
 
   const load = useCallback(() => {
     setError(null)
@@ -394,6 +433,10 @@ function Dashboard({ email }) {
         ? { ...category, products: [...category.products, created] }
         : category
     )))
+    // Show the new row rather than leaving it behind whichever category or search was open.
+    setActiveId(categoryId)
+    setQuery('')
+    setFilter('all')
   }, [])
 
   const stats = useMemo(() => {
@@ -520,6 +563,10 @@ function Dashboard({ email }) {
                 </button>
               ))}
             </div>
+
+            <button type="button" className="admin-add-button" onClick={() => setAdding(true)}>
+              <span aria-hidden="true">+</span> {text.addProduct}
+            </button>
           </div>
 
           <p className="admin-scope">
@@ -557,16 +604,16 @@ function Dashboard({ email }) {
             </table>
           )}
 
-          {/* A new product has to belong to a category, and a search spans all of them. */}
-          {!searching && active && (
-            <AddProduct
-              categoryId={active.id}
-              categoryName={active.name_ar}
-              onCreated={(created) => addProduct(active.id, created)}
-            />
-          )}
         </section>
       </div>
+
+      <AddProductDialog
+        open={adding}
+        categories={categories}
+        defaultCategoryId={active?.id ?? categories[0]?.id}
+        onClose={() => setAdding(false)}
+        onCreated={addProduct}
+      />
     </div>
   )
 }

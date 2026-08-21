@@ -93,7 +93,10 @@ first version unreadable. Above it, four counters (total, visible, hidden, witho
   and `شاى` finds `شاي`. English names match too.
 - **Filters** — all / visible / hidden / without a photo. They combine with the search.
 
-Adding a product belongs to a category, so that panel only appears when you are looking at one.
+**إضافة منتج** sits in the toolbar and opens a dialog, so it is reachable without scrolling past
+the list and works while a search is open. The dialog carries its own category picker, defaulting
+to whichever category is on screen; after saving, the list jumps to that category so the new row
+is visible. Escape, the backdrop and the close button all dismiss it.
 
 Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
 effect on their next request rather than whenever their session expires:
