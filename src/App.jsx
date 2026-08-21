@@ -10,8 +10,13 @@ import { useLanguage } from './hooks/useLanguage'
 const Home = lazy(() => import('./pages/Home'))
 const Menu = lazy(() => import('./pages/Menu'))
 const Gallery = lazy(() => import('./pages/Gallery'))
+// The dashboard pulls in @supabase/supabase-js for authentication and storage. Keeping it lazy
+// keeps all of that out of the bundle a visitor downloads.
+const Admin = lazy(() => import('./pages/Admin'))
 
-function AppContent() {
+const routeLoader = <div className="route-loader" aria-hidden="true"><span /></div>
+
+function PublicSite() {
   const { copy } = useLanguage()
 
   return (
@@ -20,7 +25,7 @@ function AppContent() {
       <ScrollManager />
       <Navbar />
       <main id="main-content">
-        <Suspense fallback={<div className="route-loader" aria-hidden="true"><span /></div>}>
+        <Suspense fallback={routeLoader}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
@@ -39,7 +44,15 @@ export default function App() {
     <LanguageProvider>
       <ContentProvider>
         <BrowserRouter>
-          <AppContent />
+          <Routes>
+            {/* The dashboard is a tool, not a page of the site: no navbar, no footer, and no
+                smooth-scrolling, which would fight with a long editable table. */}
+            <Route
+              path="/admin"
+              element={<Suspense fallback={routeLoader}><Admin /></Suspense>}
+            />
+            <Route path="*" element={<PublicSite />} />
+          </Routes>
         </BrowserRouter>
       </ContentProvider>
     </LanguageProvider>

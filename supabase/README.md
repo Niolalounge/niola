@@ -69,6 +69,37 @@ SUPABASE_SERVICE_ROLE_KEY=<secret> \
   node scripts/push-content.mjs
 ```
 
+## The dashboard
+
+`/admin` on the site itself. Sign in with the email and password of an account listed in
+`admin_users`, and you can edit prices, add products with a photograph, and hide or show items.
+
+Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
+effect on their next request rather than whenever their session expires:
+
+```sql
+-- grant, for a user that already exists in Authentication → Users
+insert into public.admin_users (user_id, email)
+select id, email from auth.users where email = 'someone@example.com';
+
+-- revoke
+delete from public.admin_users where email = 'someone@example.com';
+```
+
+Create the account itself under **Authentication → Users → Add user** in the Supabase dashboard.
+Self-signup is not wired up, so there is no way to grant yourself access from the browser.
+
+What the dashboard enforces, and why the database enforces it too:
+
+- A product needs a photograph before it can be published. `menu_products_publishable` rejects the
+  write regardless of what the page sends.
+- A new product is created hidden (`is_published` defaults to false), so a half-entered row cannot
+  reach the live site.
+- Uploads go to the `menu-images` bucket, capped at 5 MB, PNG/JPEG/WebP/AVIF only. The page
+  measures each file and stores its real dimensions, the same rule the seed follows.
+
+`/admin` is disallowed in `robots.txt` and the page adds `noindex, nofollow`.
+
 ## Security
 
 Row Level Security is on for all three tables, with one policy each: `SELECT` on published rows,

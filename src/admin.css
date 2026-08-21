@@ -1,0 +1,179 @@
+/* Menu dashboard. Loaded only by src/pages/Admin.jsx, which is a lazy route, so none of this
+   reaches a visitor's first paint. Deliberately plainer than the public site: this is a working
+   surface, and legibility beats atmosphere. */
+
+.admin-page {
+  min-height: 100vh;
+  padding: 2rem clamp(1rem, 4vw, 3rem) 6rem;
+  background: var(--deep-espresso);
+  color: var(--warm-ivory);
+  font-family: var(--body-font);
+}
+
+.admin-state { color: var(--latte-sand); font-size: 0.9rem; }
+.admin-state.is-ok { color: var(--champagne-gold); }
+.admin-error { color: #e8907f; font-size: 0.82rem; line-height: 1.5; }
+
+.admin-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--champagne-gold);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.admin-link:hover { color: var(--warm-ivory); }
+.admin-link.is-danger { color: #d98878; }
+
+/* ---- sign in ---- */
+
+.admin-signin {
+  max-width: 22rem;
+  margin: 12vh auto 0;
+  display: grid;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(216, 179, 106, 0.2);
+  border-radius: 14px;
+  background: var(--dark-walnut);
+}
+.admin-signin h1 { font-family: var(--display-font); font-size: 1.5rem; margin: 0; }
+.admin-signin label { display: grid; gap: 0.4rem; }
+.admin-signin span { font-size: 0.78rem; color: var(--latte-sand); }
+
+.admin-page input[type='email'],
+.admin-page input[type='password'],
+.admin-page input[type='text'],
+.admin-page input[type='number'],
+.admin-page input:not([type]) {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(216, 179, 106, 0.28);
+  border-radius: 8px;
+  background: rgba(23, 19, 16, 0.8);
+  color: var(--warm-ivory);
+  font: inherit;
+  font-size: 0.9rem;
+}
+.admin-page input:focus-visible {
+  outline: 2px solid var(--champagne-gold);
+  outline-offset: 1px;
+}
+
+.admin-page button[type='submit'],
+.admin-signin button {
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--champagne-gold);
+  color: var(--deep-espresso);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.admin-page button[type='submit']:disabled { opacity: 0.55; cursor: progress; }
+
+/* ---- dashboard ---- */
+
+.admin-dashboard { max-width: 1100px; margin: 0 auto; }
+
+.admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(216, 179, 106, 0.18);
+  margin-bottom: 2rem;
+}
+.admin-header h1 { font-family: var(--display-font); font-size: clamp(1.4rem, 3vw, 2rem); margin: 0; }
+.admin-header p { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--latte-sand); }
+.admin-header__account { display: flex; gap: 0.9rem; align-items: center; font-size: 0.78rem; color: var(--latte-sand); }
+
+.admin-category { margin-bottom: 2.6rem; }
+.admin-category h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  font-family: var(--display-font);
+  font-size: 1.1rem;
+  margin: 0 0 0.7rem;
+  color: var(--champagne-gold);
+}
+.admin-category h2 span { font-family: var(--body-font); font-size: 0.72rem; color: var(--latte-sand); }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid rgba(216, 179, 106, 0.12);
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
+.admin-table tr.is-hidden-row { opacity: 0.5; }
+
+.admin-cell-photo { width: 7.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.admin-cell-photo img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+.admin-photo-empty {
+  width: 44px; height: 44px; border-radius: 6px; flex: none;
+  border: 1px dashed rgba(216, 179, 106, 0.35);
+}
+
+.admin-name-en { display: block; font-size: 0.72rem; color: var(--latte-sand); }
+
+.admin-cell-price { width: 8rem; white-space: nowrap; }
+.admin-cell-price input { width: 5rem; display: inline-block; }
+.admin-cell-price span { margin-inline-start: 0.35rem; font-size: 0.75rem; color: var(--latte-sand); }
+
+.admin-cell-visible { width: 9rem; }
+.admin-toggle { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.78rem; }
+.admin-toggle input { accent-color: var(--champagne-gold); width: 1rem; height: 1rem; }
+.admin-toggle input:disabled { cursor: not-allowed; }
+.admin-hint { display: block; font-size: 0.68rem; color: var(--latte-sand); margin-top: 0.2rem; }
+
+.admin-cell-state { width: 7rem; }
+
+/* ---- add product ---- */
+
+.admin-add-trigger {
+  margin-top: 0.8rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px dashed rgba(216, 179, 106, 0.4);
+  border-radius: 8px;
+  background: none;
+  color: var(--champagne-gold);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.admin-add-trigger:hover { border-color: var(--champagne-gold); }
+
+.admin-add {
+  margin-top: 0.9rem;
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  border: 1px solid rgba(216, 179, 106, 0.22);
+  border-radius: 10px;
+  background: var(--dark-walnut);
+}
+.admin-add label { display: grid; gap: 0.35rem; }
+.admin-add span { font-size: 0.72rem; color: var(--latte-sand); }
+.admin-add input[type='file'] { font-size: 0.72rem; color: var(--latte-sand); }
+.admin-add__actions { display: flex; align-items: center; gap: 1rem; grid-column: 1 / -1; }
+.admin-add .admin-error { grid-column: 1 / -1; }
+
+@media (max-width: 760px) {
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: auto; }
+  .admin-table tr {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(216, 179, 106, 0.14);
+  }
+  .admin-table td { border: 0; padding: 0.25rem 0; }
+  .admin-cell-price input { width: 6rem; }
+}

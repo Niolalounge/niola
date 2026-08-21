@@ -1,0 +1,4 @@
+# The dashboard is a private tool, not a page of the site.
+User-agent: *
+Allow: /
+Disallow: /admin
