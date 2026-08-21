@@ -3,26 +3,15 @@ import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ArrowIcon from './ArrowIcon'
-import { homepageCategories } from '../data/menuData'
+import { useContent } from '../hooks/useContent'
 import { useLanguage } from '../hooks/useLanguage'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const subtitleKey = {
-  coffee: 'coffee',
-  'iced-drinks': 'icedCoffee',
-  tea: 'tea',
-  'fresh-juices': 'freshJuices',
-  milkshakes: 'milkshakes',
-  smoothies: 'smoothies',
-  desserts: 'desserts',
-  'hot-drinks': 'hotDrinks',
-  shisha: 'shisha',
-}
-
 export default function MenuCategories() {
   const sectionRef = useRef(null)
   const { copy, language } = useLanguage()
+  const { homeTiles } = useContent()
 
   useLayoutEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
@@ -67,7 +56,7 @@ export default function MenuCategories() {
         </header>
 
         <div className="category-grid" aria-label={copy.a11y.menuCategories}>
-          {homepageCategories.map((category, index) => (
+          {homeTiles.map((category, index) => (
             <Link
               key={category.slug}
               to={`/menu#${category.slug}`}
@@ -86,7 +75,7 @@ export default function MenuCategories() {
               <div className="category-card__content">
                 <div>
                   <h3>{category.name[language]}</h3>
-                  <p>{copy.menu.categorySubtitles[subtitleKey[category.slug]]}</p>
+                  <p>{category.subtitle[language]}</p>
                 </div>
                 <span className="category-card__arrow"><ArrowIcon /></span>
               </div>

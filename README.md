@@ -6,8 +6,13 @@ A cinematic, Arabic-first website for Niola Lounge in Zamalek, Cairo. Built with
 
 ```bash
 npm install
+cp .env.example .env   # fill in the Supabase URL and anon key
 npm run dev
 ```
+
+The menu and gallery come from Supabase at runtime; without a `.env` the site renders the copies
+in `src/data` instead. See [supabase/README.md](supabase/README.md) for the schema and for how to
+edit the menu.
 
 Production checks:
 

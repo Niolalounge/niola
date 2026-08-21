@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import LanguageProvider from './components/LanguageProvider'
+import ContentProvider from './components/ContentProvider'
 import ScrollManager from './components/ScrollManager'
 import { useLanguage } from './hooks/useLanguage'
 
@@ -36,9 +37,11 @@ function AppContent() {
 export default function App() {
   return (
     <LanguageProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <ContentProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </ContentProvider>
     </LanguageProvider>
   )
 }

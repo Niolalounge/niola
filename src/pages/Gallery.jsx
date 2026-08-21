@@ -4,62 +4,13 @@ import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ArrowIcon from '../components/ArrowIcon'
+import { useContent } from '../hooks/useContent'
 import { useLanguage } from '../hooks/useLanguage'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const galleryItems = [
-  {
-    key: 'nileView',
-    layout: 'nile-view',
-    src: '/images/gallary/A view of the Nile.jpeg',
-    width: 1536,
-    height: 864,
-    objectPosition: '50% 50%',
-  },
-  {
-    key: 'luxuriousAtmosphere',
-    layout: 'luxurious-atmosphere',
-    src: '/images/gallary/luxurious_atmosphere.png',
-    width: 1204,
-    height: 1306,
-    objectPosition: '52% 58%',
-  },
-  {
-    key: 'niolaCoffee',
-    layout: 'niola-coffee',
-    src: '/images/gallary/Niola_Coffee.png',
-    width: 1220,
-    height: 1289,
-    objectPosition: '49% 56%',
-  },
-  {
-    key: 'niolaDayOut',
-    layout: 'niola-dayout',
-    src: '/images/gallary/Niola_DAYOUT.png',
-    width: 941,
-    height: 1672,
-    objectPosition: '50% 44%',
-  },
-  {
-    key: 'niolaNile',
-    layout: 'niola-nile',
-    src: '/images/gallary/Niola_Nile.png',
-    width: 941,
-    height: 1672,
-    objectPosition: '50% 48%',
-  },
-  {
-    key: 'specialTimes',
-    layout: 'special-times',
-    src: '/images/gallary/Special_Times.png',
-    width: 1254,
-    height: 1254,
-    objectPosition: '56% 68%',
-  },
-]
-
 export default function Gallery() {
+  const { gallery: galleryItems } = useContent()
   const pageRef = useRef(null)
   const lightboxRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -70,16 +21,17 @@ export default function Gallery() {
   const lightboxOpen = activeIndex !== null
 
   const closeLightbox = useCallback(() => setActiveIndex(null), [])
+  const itemCount = galleryItems.length
   const showPrevious = useCallback(() => {
     setActiveIndex((current) => (
-      current === null ? 0 : (current - 1 + galleryItems.length) % galleryItems.length
+      current === null ? 0 : (current - 1 + itemCount) % itemCount
     ))
-  }, [])
+  }, [itemCount])
   const showNext = useCallback(() => {
     setActiveIndex((current) => (
-      current === null ? 0 : (current + 1) % galleryItems.length
+      current === null ? 0 : (current + 1) % itemCount
     ))
-  }, [])
+  }, [itemCount])
 
   const openLightbox = (index) => {
     lastFocusedRef.current = document.activeElement
@@ -215,7 +167,7 @@ export default function Gallery() {
   }
 
   const renderCard = (item, index) => {
-    const itemCopy = copy.gallery.items[item.key]
+    const itemCopy = { label: item.label[language], alt: item.alt[language] }
     return (
       <button
         key={item.key}
@@ -247,7 +199,9 @@ export default function Gallery() {
   }
 
   const activeItem = activeIndex === null ? null : galleryItems[activeIndex]
-  const activeItemCopy = activeItem ? copy.gallery.items[activeItem.key] : null
+  const activeItemCopy = activeItem
+    ? { label: activeItem.label[language], alt: activeItem.alt[language] }
+    : null
   const counter = activeIndex === null
     ? ''
     : copy.gallery.lightbox.counter

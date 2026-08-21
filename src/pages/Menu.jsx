@@ -1,84 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import ArrowIcon from '../components/ArrowIcon'
-import { menuCategories } from '../data/menuData'
 import { scrollWindowTo } from '../lib/scroll'
+import { useContent } from '../hooks/useContent'
 import { useLanguage } from '../hooks/useLanguage'
 
-const preferredOrder = [
-  'coffee',
-  'specialty-coffee',
-  'iced-drinks',
-  'hot-drinks',
-  'tea',
-  'fresh-juices',
-  'smoothies',
-  'milkshakes',
-  'desserts',
-  'shisha',
-]
-
-const translationCategoryKey = {
-  coffee: 'coffee',
-  'specialty-coffee': 'specialtyCoffee',
-  'iced-drinks': 'icedCoffee',
-  'hot-drinks': 'hotDrinks',
-  tea: 'tea',
-  'fresh-juices': 'freshJuices',
-  smoothies: 'smoothies',
-  milkshakes: 'milkshakes',
-  desserts: 'desserts',
-  shisha: 'shisha',
-}
-
-const categoryImageDimensions = {
-  coffee: [1254, 1254],
-  'specialty-coffee': [1254, 1254],
-  'iced-drinks': [1198, 1313],
-  'hot-drinks': [1254, 1254],
-  tea: [1402, 1122],
-  'fresh-juices': [1122, 1402],
-  smoothies: [1537, 1023],
-  milkshakes: [1122, 1402],
-  desserts: [1536, 1024],
-  shisha: [1254, 1254],
-}
-
-const productImageDimensionOverrides = {
-  'fresh-juices/avocado-juice': [1086, 1448],
-  'fresh-juices/watermelon-juice': [1086, 1448],
-  'fresh-juices/guava-juice': [1145, 1373],
-  'fresh-juices/layered-juice': [1149, 1369],
-  'iced-drinks/iced-matcha-latte': [1086, 1448],
-  'iced-drinks/iced-nutella': [1197, 1314],
-  'iced-drinks/iced-lotus-latte': [1122, 1402],
-  'iced-drinks/iced-white-mocha': [1086, 1448],
-  'iced-drinks/iced-blue-latte': [1086, 1448],
-  'milkshakes/vanilla-milkshake': [1179, 1334],
-  'milkshakes/pistachio-milkshake': [1123, 1401],
-  'hot-drinks/hot-chocolate': [1402, 1122],
-  'hot-drinks/hot-tiramisu': [1448, 1086],
-  'shisha/shisha': [1122, 1402],
-  'shisha/salloum-shisha': [1535, 1024],
-}
-
-const categories = preferredOrder
-  .map((slug) => menuCategories.find((category) => category.slug === slug))
-  .filter(Boolean)
-  .map((category) => ({
-    ...category,
-    products: category.products.filter((item) => item.image && item.slug !== 'red-tea-pot'),
-  }))
-  .filter((category) => category.products.length > 0)
-
-const defaultCategory = categories[0]?.slug ?? 'coffee'
-
-function getProductImageDimensions(categorySlug, productSlug) {
-  return productImageDimensionOverrides[`${categorySlug}/${productSlug}`]
-    ?? categoryImageDimensions[categorySlug]
-}
-
-function readCategoryFromHash() {
+function readCategoryFromHash(categories) {
   if (typeof window === 'undefined') return null
   const slug = decodeURIComponent(window.location.hash.slice(1))
   return categories.some((category) => category.slug === slug) ? slug : null
@@ -86,26 +13,31 @@ function readCategoryFromHash() {
 
 export default function Menu() {
   const { copy, language } = useLanguage()
+  const { categories } = useContent()
   const { key: locationKey } = useLocation()
-  const [activeCategory, setActiveCategory] = useState(() => readCategoryFromHash() ?? defaultCategory)
+  const [activeCategory, setActiveCategory] = useState(() => readCategoryFromHash(categories))
   const categoryTrackRef = useRef(null)
 
-  const category = categories.find((item) => item.slug === activeCategory) ?? categories[0]
+  const defaultCategory = categories[0]?.slug
+  const category = useMemo(
+    () => categories.find((item) => item.slug === activeCategory) ?? categories[0],
+    [categories, activeCategory],
+  )
   const categoryIndex = categories.indexOf(category)
 
   // Deep links (/menu#tea) open the requested category directly; plain /menu opens the first one.
   useEffect(() => {
-    setActiveCategory(readCategoryFromHash() ?? defaultCategory)
-  }, [locationKey])
+    setActiveCategory(readCategoryFromHash(categories) ?? defaultCategory)
+  }, [categories, defaultCategory, locationKey])
 
   useEffect(() => {
     const syncFromHash = () => {
-      const requested = readCategoryFromHash()
+      const requested = readCategoryFromHash(categories)
       if (requested) setActiveCategory(requested)
     }
     window.addEventListener('hashchange', syncFromHash)
     return () => window.removeEventListener('hashchange', syncFromHash)
-  }, [])
+  }, [categories])
 
   // Keep the active tab visible inside the horizontal track without moving the page.
   useEffect(() => {
@@ -141,6 +73,8 @@ export default function Menu() {
 
   const formatPrice = (price) => `${new Intl.NumberFormat('en-US').format(price)} ${copy.menu.currency}`
 
+  if (!category) return null
+
   return (
     <div className="page menu-page">
       <nav className="menu-category-nav" aria-label={copy.menu.categoryNavLabel}>
@@ -174,34 +108,30 @@ export default function Menu() {
                 <h2>{category.name[language]}</h2>
               </div>
               <div className="menu-section__meta">
-                <p>{copy.menu.categorySubtitles[translationCategoryKey[category.slug]]}</p>
+                <p>{category.subtitle[language]}</p>
                 <span>{String(category.products.length).padStart(2, '0')}</span>
               </div>
             </header>
 
             <ul className="menu-product-grid">
-              {category.products.map((item) => {
-                const [imageWidth, imageHeight] = getProductImageDimensions(category.slug, item.slug)
-
-                return (
-                  <li className="menu-product-card" key={item.slug}>
-                    <div className="menu-product-card__media">
-                      <img
-                        src={item.image}
-                        alt={`${item.name[language]} — ${copy.a11y.productImage}`}
-                        width={imageWidth}
-                        height={imageHeight}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                    <div className="menu-product-card__body">
-                      <h3>{item.name[language]}</h3>
-                      <span dir="ltr">{formatPrice(item.price)}</span>
-                    </div>
-                  </li>
-                )
-              })}
+              {category.products.map((item) => (
+                <li className="menu-product-card" key={item.slug}>
+                  <div className="menu-product-card__media">
+                    <img
+                      src={item.image}
+                      alt={`${item.name[language]} — ${copy.a11y.productImage}`}
+                      width={item.imageWidth}
+                      height={item.imageHeight}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="menu-product-card__body">
+                    <h3>{item.name[language]}</h3>
+                    <span dir="ltr">{formatPrice(item.price)}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </section>

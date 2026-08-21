@@ -1,0 +1,1863 @@
+{
+  "generatedFrom": [
+    "src/data/menuData.js",
+    "src/data/translations.js",
+    "src/data/imageDimensions.js",
+    "src/data/galleryData.js"
+  ],
+  "stats": {
+    "categories": 10,
+    "publishedCategories": 10,
+    "products": 115,
+    "publishedProducts": 66,
+    "galleryItems": 6,
+    "duplicateProductSlugs": [],
+    "measurementCorrections": [
+      {
+        "item": "tea/red-tea-pot",
+        "declaredInSource": "1402x1122",
+        "measured": "1400x1123"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "slug": "desserts",
+      "name": {
+        "ar": "الحلويات",
+        "en": "Desserts"
+      },
+      "subtitle": {
+        "ar": "نهاية حلوة للحظة جميلة",
+        "en": "A sweet finish to a beautiful moment"
+      },
+      "sort_order": 8,
+      "is_published": true,
+      "default_image_width": 1536,
+      "default_image_height": 1024,
+      "homepage_image_url": "/images/dessert/moltin Cake.png",
+      "homepage_name": {
+        "ar": "الحلويات",
+        "en": "Desserts"
+      },
+      "homepage_sort_order": 6,
+      "products": [
+        {
+          "slug": "molten-cake",
+          "name": {
+            "ar": "مولتن كيك",
+            "en": "Molten Cake"
+          },
+          "price": 185,
+          "image_url": "/images/dessert/moltin Cake.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "cheesecake",
+          "name": {
+            "ar": "شيز كيك",
+            "en": "Cheesecake"
+          },
+          "price": 175,
+          "image_url": "/images/dessert/Chessecake.jpeg",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "red-velvet-cake",
+          "name": {
+            "ar": "ريد فيلفت",
+            "en": "Red Velvet Cake"
+          },
+          "price": 170,
+          "image_url": "/images/dessert/Redvelvet Cake.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "brownies",
+          "name": {
+            "ar": "براونيز",
+            "en": "Brownies"
+          },
+          "price": 175,
+          "image_url": "/images/dessert/Brownies.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "fudge",
+          "name": {
+            "ar": "فادج",
+            "en": "Fudge"
+          },
+          "price": 175,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 4,
+          "is_published": false
+        },
+        {
+          "slug": "ice-cream",
+          "name": {
+            "ar": "آيس كريم",
+            "en": "Ice Cream"
+          },
+          "price": 165,
+          "image_url": "/images/dessert/ice cream.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 5,
+          "is_published": true
+        },
+        {
+          "slug": "waffle",
+          "name": {
+            "ar": "وافل",
+            "en": "Waffle"
+          },
+          "price": 165,
+          "image_url": "/images/dessert/waffel.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 6,
+          "is_published": true
+        },
+        {
+          "slug": "niola-waffle",
+          "name": {
+            "ar": "وافل نيولا",
+            "en": "Niola Waffle"
+          },
+          "price": 220,
+          "image_url": "/images/dessert/waffel Niola.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 7,
+          "is_published": true
+        },
+        {
+          "slug": "plain-kunafa",
+          "name": {
+            "ar": "كنافة عادي",
+            "en": "Plain Kunafa"
+          },
+          "price": 170,
+          "image_url": "/images/dessert/Kunafa.png",
+          "image_width": 1536,
+          "image_height": 1024,
+          "sort_order": 8,
+          "is_published": true
+        },
+        {
+          "slug": "nutella-kunafa",
+          "name": {
+            "ar": "كنافة نوتيلا",
+            "en": "Nutella Kunafa"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 9,
+          "is_published": false
+        },
+        {
+          "slug": "pistachio-kunafa",
+          "name": {
+            "ar": "كنافة بالفستق",
+            "en": "Pistachio Kunafa"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 10,
+          "is_published": false
+        },
+        {
+          "slug": "tiramisu",
+          "name": {
+            "ar": "تيراميسو",
+            "en": "Tiramisu"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 11,
+          "is_published": false
+        }
+      ]
+    },
+    {
+      "slug": "fresh-juices",
+      "name": {
+        "ar": "العصائر الفريش",
+        "en": "Fresh Juices"
+      },
+      "subtitle": {
+        "ar": "انتعاش بطعم الفاكهة",
+        "en": "Freshness filled with fruit"
+      },
+      "sort_order": 5,
+      "is_published": true,
+      "default_image_width": 1122,
+      "default_image_height": 1402,
+      "homepage_image_url": "/images/fresh jucies/Fresh Orange Juice.png",
+      "homepage_name": {
+        "ar": "العصائر الفريش",
+        "en": "Fresh Juices"
+      },
+      "homepage_sort_order": 3,
+      "products": [
+        {
+          "slug": "orange-juice",
+          "name": {
+            "ar": "عصير برتقال",
+            "en": "Orange Juice"
+          },
+          "price": 120,
+          "image_url": "/images/fresh jucies/Fresh Orange Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-juice",
+          "name": {
+            "ar": "عصير ليمون",
+            "en": "Lemon Juice"
+          },
+          "price": 120,
+          "image_url": "/images/fresh jucies/Fresh Lemon Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-mint-juice",
+          "name": {
+            "ar": "عصير ليمون نعناع",
+            "en": "Lemon Mint Juice"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Lemon Mint Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-juice-with-milk",
+          "name": {
+            "ar": "عصير ليمون بالحليب",
+            "en": "Lemon Juice with Milk"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 3,
+          "is_published": false
+        },
+        {
+          "slug": "avocado-juice",
+          "name": {
+            "ar": "عصير أفوكادو",
+            "en": "Avocado Juice"
+          },
+          "price": 160,
+          "image_url": "/images/fresh jucies/Avocado Juice.png",
+          "image_width": 1086,
+          "image_height": 1448,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "avocado-juice-with-milk",
+          "name": {
+            "ar": "عصير أفوكادو بالحليب",
+            "en": "Avocado Juice with Milk"
+          },
+          "price": 180,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 5,
+          "is_published": false
+        },
+        {
+          "slug": "avocado-with-nuts",
+          "name": {
+            "ar": "أفوكادو بالمكسرات",
+            "en": "Avocado with Nuts"
+          },
+          "price": 220,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 6,
+          "is_published": false
+        },
+        {
+          "slug": "melon-juice",
+          "name": {
+            "ar": "عصير شمام",
+            "en": "Melon Juice"
+          },
+          "price": 120,
+          "image_url": "/images/fresh jucies/Fresh Melon Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 7,
+          "is_published": true
+        },
+        {
+          "slug": "melon-juice-with-milk",
+          "name": {
+            "ar": "عصير شمام بالحليب",
+            "en": "Melon Juice with Milk"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 8,
+          "is_published": false
+        },
+        {
+          "slug": "watermelon-juice",
+          "name": {
+            "ar": "عصير بطيخ",
+            "en": "Watermelon Juice"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Fresh Watermelon Juice.png",
+          "image_width": 1086,
+          "image_height": 1448,
+          "sort_order": 9,
+          "is_published": true
+        },
+        {
+          "slug": "grape-juice",
+          "name": {
+            "ar": "عصير عنب",
+            "en": "Grape Juice"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Fresh Grape Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 10,
+          "is_published": true
+        },
+        {
+          "slug": "strawberry-juice",
+          "name": {
+            "ar": "عصير فراولة",
+            "en": "Strawberry Juice"
+          },
+          "price": 120,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 11,
+          "is_published": false
+        },
+        {
+          "slug": "strawberry-juice-with-milk",
+          "name": {
+            "ar": "عصير فراولة بالحليب",
+            "en": "Strawberry Juice with Milk"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Strawberry with Milk.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 12,
+          "is_published": true
+        },
+        {
+          "slug": "cocktail-juice",
+          "name": {
+            "ar": "عصير كوكتيل",
+            "en": "Cocktail Juice"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 13,
+          "is_published": false
+        },
+        {
+          "slug": "cocktail-juice-with-milk",
+          "name": {
+            "ar": "عصير كوكتيل بالحليب",
+            "en": "Cocktail Juice with Milk"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 14,
+          "is_published": false
+        },
+        {
+          "slug": "mango-juice",
+          "name": {
+            "ar": "عصير مانجو",
+            "en": "Mango Juice"
+          },
+          "price": 120,
+          "image_url": "/images/fresh jucies/Fresh Mango Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 15,
+          "is_published": true
+        },
+        {
+          "slug": "mango-juice-with-milk",
+          "name": {
+            "ar": "عصير مانجو بالحليب",
+            "en": "Mango Juice with Milk"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 16,
+          "is_published": false
+        },
+        {
+          "slug": "guava-juice",
+          "name": {
+            "ar": "عصير جوافة",
+            "en": "Guava Juice"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Fresh Guava Juice.png",
+          "image_width": 1145,
+          "image_height": 1373,
+          "sort_order": 17,
+          "is_published": true
+        },
+        {
+          "slug": "layered-juice",
+          "name": {
+            "ar": "عصير طبقات",
+            "en": "Layered Juice"
+          },
+          "price": 130,
+          "image_url": "/images/fresh jucies/Layered Juice.png",
+          "image_width": 1149,
+          "image_height": 1369,
+          "sort_order": 18,
+          "is_published": true
+        },
+        {
+          "slug": "banana-with-milk",
+          "name": {
+            "ar": "عصير موز بالحليب",
+            "en": "Banana with Milk"
+          },
+          "price": 110,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 19,
+          "is_published": false
+        },
+        {
+          "slug": "banana-milk-chocolate",
+          "name": {
+            "ar": "عصير موز بالحليب وشوكولاتة",
+            "en": "Banana Milk with Chocolate"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 20,
+          "is_published": false
+        },
+        {
+          "slug": "banana-milk-strawberry",
+          "name": {
+            "ar": "عصير موز بالحليب وفراولة",
+            "en": "Banana Milk with Strawberry"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 21,
+          "is_published": false
+        },
+        {
+          "slug": "kiwi-juice",
+          "name": {
+            "ar": "عصير كيوي",
+            "en": "Kiwi Juice"
+          },
+          "price": 150,
+          "image_url": "/images/fresh jucies/Fresh Kiwi Juice.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 22,
+          "is_published": true
+        },
+        {
+          "slug": "kiwi-juice-with-milk",
+          "name": {
+            "ar": "عصير كيوي بالحليب",
+            "en": "Kiwi Juice with Milk"
+          },
+          "price": 160,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 23,
+          "is_published": false
+        },
+        {
+          "slug": "apple-juice",
+          "name": {
+            "ar": "عصير تفاح",
+            "en": "Apple Juice"
+          },
+          "price": 120,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 24,
+          "is_published": false
+        },
+        {
+          "slug": "pineapple-juice",
+          "name": {
+            "ar": "عصير أناناس",
+            "en": "Pineapple Juice"
+          },
+          "price": 120,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 25,
+          "is_published": false
+        },
+        {
+          "slug": "pineapple-juice-with-milk",
+          "name": {
+            "ar": "عصير أناناس بالحليب",
+            "en": "Pineapple Juice with Milk"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 26,
+          "is_published": false
+        },
+        {
+          "slug": "medium-fruit-platter",
+          "name": {
+            "ar": "طبق فواكه وسط",
+            "en": "Medium Fruit Platter"
+          },
+          "price": 350,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 27,
+          "is_published": false
+        },
+        {
+          "slug": "large-fruit-platter",
+          "name": {
+            "ar": "طبق فواكه كبير",
+            "en": "Large Fruit Platter"
+          },
+          "price": 450,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 28,
+          "is_published": false
+        },
+        {
+          "slug": "florida-juice",
+          "name": {
+            "ar": "عصير فلوريدا",
+            "en": "Florida Juice"
+          },
+          "price": 150,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 29,
+          "is_published": false
+        },
+        {
+          "slug": "niola-lounge-juice",
+          "name": {
+            "ar": "عصير نيولا لاونج",
+            "en": "Niola Lounge Juice"
+          },
+          "price": 160,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 30,
+          "is_published": false
+        },
+        {
+          "slug": "watermelon-strawberry-juice",
+          "name": {
+            "ar": "عصير بطيخ بالفراولة",
+            "en": "Watermelon Strawberry Juice"
+          },
+          "price": 160,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 31,
+          "is_published": false
+        }
+      ]
+    },
+    {
+      "slug": "tea",
+      "name": {
+        "ar": "الشاي",
+        "en": "Tea"
+      },
+      "subtitle": {
+        "ar": "كوب يهدّئ المساء",
+        "en": "A cup to ease into the evening"
+      },
+      "sort_order": 4,
+      "is_published": true,
+      "default_image_width": 1402,
+      "default_image_height": 1122,
+      "homepage_image_url": "/images/tea/krak tea.png",
+      "homepage_name": {
+        "ar": "الشاي",
+        "en": "Tea"
+      },
+      "homepage_sort_order": 2,
+      "products": [
+        {
+          "slug": "koshary-tea",
+          "name": {
+            "ar": "شاي كشري",
+            "en": "Koshary Tea"
+          },
+          "price": 45,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 0,
+          "is_published": false
+        },
+        {
+          "slug": "lipton-tea",
+          "name": {
+            "ar": "شاي ليبتون",
+            "en": "Lipton Tea"
+          },
+          "price": 45,
+          "image_url": "/images/tea/liption tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "mint-tea",
+          "name": {
+            "ar": "شاي نعناع",
+            "en": "Mint Tea"
+          },
+          "price": 45,
+          "image_url": "/images/tea/mint tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "green-tea",
+          "name": {
+            "ar": "شاي أخضر",
+            "en": "Green Tea"
+          },
+          "price": 50,
+          "image_url": "/images/tea/green tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "karak-tea",
+          "name": {
+            "ar": "شاي كرك",
+            "en": "Karak Tea"
+          },
+          "price": 70,
+          "image_url": "/images/tea/krak tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-ginger-tea",
+          "name": {
+            "ar": "شاي ليمون مع زنجبيل",
+            "en": "Lemon Ginger Tea"
+          },
+          "price": 55,
+          "image_url": "/images/tea/lemon and ginger tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 5,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-tea",
+          "name": {
+            "ar": "شاي ليمون",
+            "en": "Lemon Tea"
+          },
+          "price": 55,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 6,
+          "is_published": false
+        },
+        {
+          "slug": "red-tea-pot",
+          "name": {
+            "ar": "براد شاي أحمر",
+            "en": "Red Tea Pot"
+          },
+          "price": 150,
+          "image_url": "/images/tea/red tea.png",
+          "image_width": 1400,
+          "image_height": 1123,
+          "sort_order": 7,
+          "is_published": false
+        },
+        {
+          "slug": "karak-tea-pot",
+          "name": {
+            "ar": "براد شاي كرك",
+            "en": "Karak Tea Pot"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 8,
+          "is_published": false
+        }
+      ]
+    },
+    {
+      "slug": "coffee",
+      "name": {
+        "ar": "القهوة",
+        "en": "Coffee"
+      },
+      "subtitle": {
+        "ar": "دفء القهوة في كل رشفة",
+        "en": "Warmth in every sip"
+      },
+      "sort_order": 0,
+      "is_published": true,
+      "default_image_width": 1254,
+      "default_image_height": 1254,
+      "homepage_image_url": "/images/coffee/Cappuccino - Copy.png",
+      "homepage_name": {
+        "ar": "القهوة",
+        "en": "Coffee"
+      },
+      "homepage_sort_order": 0,
+      "products": [
+        {
+          "slug": "espresso",
+          "name": {
+            "ar": "إسبريسو",
+            "en": "Espresso"
+          },
+          "price": 85,
+          "image_url": "/images/coffee/Espresso - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "double-espresso",
+          "name": {
+            "ar": "إسبريسو دبل",
+            "en": "Double Espresso"
+          },
+          "price": 100,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 1,
+          "is_published": false
+        },
+        {
+          "slug": "espresso-crema",
+          "name": {
+            "ar": "إسبريسو كريمة",
+            "en": "Espresso Crema"
+          },
+          "price": 105,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 2,
+          "is_published": false
+        },
+        {
+          "slug": "espresso-foam",
+          "name": {
+            "ar": "إسبريسو فوم",
+            "en": "Espresso Foam"
+          },
+          "price": 95,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 3,
+          "is_published": false
+        },
+        {
+          "slug": "double-espresso-foam",
+          "name": {
+            "ar": "إسبريسو فوم دبل",
+            "en": "Double Espresso Foam"
+          },
+          "price": 105,
+          "image_url": "/images/coffee/Double Espresso Foam - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "turkish-coffee",
+          "name": {
+            "ar": "قهوة تركي",
+            "en": "Turkish Coffee"
+          },
+          "price": 75,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 5,
+          "is_published": false
+        },
+        {
+          "slug": "double-turkish-coffee",
+          "name": {
+            "ar": "قهوة تركي دبل",
+            "en": "Double Turkish Coffee"
+          },
+          "price": 90,
+          "image_url": "/images/coffee/Double Turkish Coffee - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 6,
+          "is_published": true
+        },
+        {
+          "slug": "french-coffee",
+          "name": {
+            "ar": "قهوة فرنساوي",
+            "en": "French Coffee"
+          },
+          "price": 90,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 7,
+          "is_published": false
+        },
+        {
+          "slug": "yemeni-coffee",
+          "name": {
+            "ar": "قهوة يمني",
+            "en": "Yemeni Coffee"
+          },
+          "price": 80,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 8,
+          "is_published": false
+        },
+        {
+          "slug": "mocha-coffee",
+          "name": {
+            "ar": "قهوة موكا",
+            "en": "Mocha Coffee"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 9,
+          "is_published": false
+        },
+        {
+          "slug": "hazelnut-coffee",
+          "name": {
+            "ar": "قهوة بندق",
+            "en": "Hazelnut Coffee"
+          },
+          "price": 90,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 10,
+          "is_published": false
+        },
+        {
+          "slug": "americano",
+          "name": {
+            "ar": "قهوة أمريكانو",
+            "en": "Americano"
+          },
+          "price": 90,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 11,
+          "is_published": false
+        },
+        {
+          "slug": "black-nescafe",
+          "name": {
+            "ar": "نسكافيه بلاك",
+            "en": "Black Nescafé"
+          },
+          "price": 110,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 12,
+          "is_published": false
+        },
+        {
+          "slug": "nescafe-with-milk",
+          "name": {
+            "ar": "نسكافيه حليب",
+            "en": "Nescafé with Milk"
+          },
+          "price": 130,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 13,
+          "is_published": false
+        },
+        {
+          "slug": "cappuccino",
+          "name": {
+            "ar": "كابتشينو",
+            "en": "Cappuccino"
+          },
+          "price": 130,
+          "image_url": "/images/coffee/Cappuccino - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 14,
+          "is_published": true
+        },
+        {
+          "slug": "latte",
+          "name": {
+            "ar": "لاتيه",
+            "en": "Latte"
+          },
+          "price": 135,
+          "image_url": "/images/coffee/Latte - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 15,
+          "is_published": true
+        },
+        {
+          "slug": "flat-white",
+          "name": {
+            "ar": "فلات وايت",
+            "en": "Flat White"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 16,
+          "is_published": false
+        },
+        {
+          "slug": "white-mocha",
+          "name": {
+            "ar": "وايت موكا",
+            "en": "White Mocha"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 17,
+          "is_published": false
+        },
+        {
+          "slug": "caramel-latte",
+          "name": {
+            "ar": "كراميل لاتيه",
+            "en": "Caramel Latte"
+          },
+          "price": 150,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 18,
+          "is_published": false
+        },
+        {
+          "slug": "spanish-latte",
+          "name": {
+            "ar": "سبانش لاتيه",
+            "en": "Spanish Latte"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 19,
+          "is_published": false
+        },
+        {
+          "slug": "pistachio-latte",
+          "name": {
+            "ar": "لاتيه بيستاشيو",
+            "en": "Pistachio Latte"
+          },
+          "price": 150,
+          "image_url": "/images/coffee/Pistachio Latte - Copy.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 20,
+          "is_published": true
+        },
+        {
+          "slug": "arabic-coffee-pot",
+          "name": {
+            "ar": "دلة قهوة عربي",
+            "en": "Arabic Coffee Pot"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 21,
+          "is_published": false
+        }
+      ]
+    },
+    {
+      "slug": "iced-drinks",
+      "name": {
+        "ar": "القهوة الباردة",
+        "en": "Iced Drinks"
+      },
+      "subtitle": {
+        "ar": "قهوة منعشة على مزاجك",
+        "en": "Refreshing coffee, your way"
+      },
+      "sort_order": 2,
+      "is_published": true,
+      "default_image_width": 1198,
+      "default_image_height": 1313,
+      "homepage_image_url": "/images/iced drinks/Iced Latte.png",
+      "homepage_name": {
+        "ar": "القهوة الباردة",
+        "en": "Iced Coffee"
+      },
+      "homepage_sort_order": 1,
+      "products": [
+        {
+          "slug": "iced-chocolate",
+          "name": {
+            "ar": "آيس شوكليت",
+            "en": "Iced Chocolate"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 0,
+          "is_published": false
+        },
+        {
+          "slug": "iced-matcha-latte",
+          "name": {
+            "ar": "آيس ماتشا لاتيه",
+            "en": "Iced Matcha Latte"
+          },
+          "price": 150,
+          "image_url": "/images/iced drinks/Iced Matcha Latte.png",
+          "image_width": 1086,
+          "image_height": 1448,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "iced-matcha",
+          "name": {
+            "ar": "آيس ماتشا",
+            "en": "Iced Matcha"
+          },
+          "price": 140,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 2,
+          "is_published": false
+        },
+        {
+          "slug": "iced-latte",
+          "name": {
+            "ar": "آيس لاتيه",
+            "en": "Iced Latte"
+          },
+          "price": 150,
+          "image_url": "/images/iced drinks/Iced Latte.png",
+          "image_width": 1198,
+          "image_height": 1313,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "iced-nutella",
+          "name": {
+            "ar": "آيس نوتيلا",
+            "en": "Iced Nutella"
+          },
+          "price": 160,
+          "image_url": "/images/iced drinks/Iced Nutella.png",
+          "image_width": 1197,
+          "image_height": 1314,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "iced-pistachio-latte",
+          "name": {
+            "ar": "آيس لاتيه بيستاشيو",
+            "en": "Iced Pistachio Latte"
+          },
+          "price": 160,
+          "image_url": "/images/iced drinks/Iced Pistachio Latte.png",
+          "image_width": 1198,
+          "image_height": 1313,
+          "sort_order": 5,
+          "is_published": true
+        },
+        {
+          "slug": "iced-lotus-latte",
+          "name": {
+            "ar": "آيس لوتس لاتيه",
+            "en": "Iced Lotus Latte"
+          },
+          "price": 160,
+          "image_url": "/images/iced drinks/Iced Lotus Latte.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 6,
+          "is_published": true
+        },
+        {
+          "slug": "iced-mocha",
+          "name": {
+            "ar": "آيس موكا",
+            "en": "Iced Mocha"
+          },
+          "price": 160,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 7,
+          "is_published": false
+        },
+        {
+          "slug": "iced-white-mocha",
+          "name": {
+            "ar": "آيس وايت موكا",
+            "en": "Iced White Mocha"
+          },
+          "price": 160,
+          "image_url": "/images/iced drinks/Iced White Mocha.png",
+          "image_width": 1086,
+          "image_height": 1448,
+          "sort_order": 8,
+          "is_published": true
+        },
+        {
+          "slug": "iced-spanish-latte",
+          "name": {
+            "ar": "آيس سبانيش لاتيه",
+            "en": "Iced Spanish Latte"
+          },
+          "price": 160,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 9,
+          "is_published": false
+        },
+        {
+          "slug": "iced-blue-latte",
+          "name": {
+            "ar": "آيس بلو لاتيه",
+            "en": "Iced Blue Latte"
+          },
+          "price": 170,
+          "image_url": "/images/iced drinks/Iced Blue Latte.png",
+          "image_width": 1086,
+          "image_height": 1448,
+          "sort_order": 10,
+          "is_published": true
+        },
+        {
+          "slug": "iced-spanish-pistachio",
+          "name": {
+            "ar": "آيس سبانيش بيستاشيو",
+            "en": "Iced Spanish Pistachio"
+          },
+          "price": 170,
+          "image_url": "/images/iced drinks/Iced Spanish Pistachio.png",
+          "image_width": 1198,
+          "image_height": 1313,
+          "sort_order": 11,
+          "is_published": true
+        },
+        {
+          "slug": "iced-strawberry-matcha",
+          "name": {
+            "ar": "آيس ماتشا فراولة",
+            "en": "Iced Strawberry Matcha"
+          },
+          "price": 160,
+          "image_url": "/images/iced drinks/Iced Strawberry Matcha.png",
+          "image_width": 1198,
+          "image_height": 1313,
+          "sort_order": 12,
+          "is_published": true
+        }
+      ]
+    },
+    {
+      "slug": "milkshakes",
+      "name": {
+        "ar": "الميلك شيك",
+        "en": "Milkshakes"
+      },
+      "subtitle": {
+        "ar": "غني وكريمي",
+        "en": "Rich and creamy"
+      },
+      "sort_order": 7,
+      "is_published": true,
+      "default_image_width": 1122,
+      "default_image_height": 1402,
+      "homepage_image_url": "/images/milkshake/Pistachio Milkshake.png",
+      "homepage_name": {
+        "ar": "الميلك شيك",
+        "en": "Milkshakes"
+      },
+      "homepage_sort_order": 4,
+      "products": [
+        {
+          "slug": "vanilla-milkshake",
+          "name": {
+            "ar": "فانيليا",
+            "en": "Vanilla Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Vanilla Milkshake.png",
+          "image_width": 1179,
+          "image_height": 1334,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "caramel-milkshake",
+          "name": {
+            "ar": "كراميل",
+            "en": "Caramel Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Caramel Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "lotus-milkshake",
+          "name": {
+            "ar": "لوتس",
+            "en": "Lotus Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Lotus Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "matcha-milkshake",
+          "name": {
+            "ar": "ماتشا",
+            "en": "Matcha Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Matcha Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "chocolate-milkshake",
+          "name": {
+            "ar": "شوكليت",
+            "en": "Chocolate Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Chocolate Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "strawberry-milkshake",
+          "name": {
+            "ar": "فراولة",
+            "en": "Strawberry Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Strawberry Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 5,
+          "is_published": true
+        },
+        {
+          "slug": "oreo-milkshake",
+          "name": {
+            "ar": "أوريو",
+            "en": "Oreo Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Oreo Milkshake.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 6,
+          "is_published": true
+        },
+        {
+          "slug": "pistachio-milkshake",
+          "name": {
+            "ar": "بيستاشيو",
+            "en": "Pistachio Milkshake"
+          },
+          "price": 190,
+          "image_url": "/images/milkshake/Pistachio Milkshake.png",
+          "image_width": 1123,
+          "image_height": 1401,
+          "sort_order": 7,
+          "is_published": true
+        }
+      ]
+    },
+    {
+      "slug": "hot-drinks",
+      "name": {
+        "ar": "المشروبات الساخنة",
+        "en": "Hot Drinks"
+      },
+      "subtitle": {
+        "ar": "لحظات دافئة",
+        "en": "Moments of warmth"
+      },
+      "sort_order": 3,
+      "is_published": true,
+      "default_image_width": 1254,
+      "default_image_height": 1254,
+      "homepage_image_url": "/images/hot drinks/Hot Chocolate.png",
+      "homepage_name": {
+        "ar": "المشروبات الساخنة",
+        "en": "Hot Drinks"
+      },
+      "homepage_sort_order": 7,
+      "products": [
+        {
+          "slug": "hot-cider",
+          "name": {
+            "ar": "هوت سيدر",
+            "en": "Hot Cider"
+          },
+          "price": 80,
+          "image_url": "/images/hot drinks/Hot Cider.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "hot-chocolate",
+          "name": {
+            "ar": "هوت شوكليت",
+            "en": "Hot Chocolate"
+          },
+          "price": 130,
+          "image_url": "/images/hot drinks/Hot Chocolate.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "hot-tiramisu",
+          "name": {
+            "ar": "هوت تيراميسو",
+            "en": "Hot Tiramisu"
+          },
+          "price": 150,
+          "image_url": "/images/hot drinks/Hot Tiramisu.png",
+          "image_width": 1448,
+          "image_height": 1086,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "anise",
+          "name": {
+            "ar": "يانسون",
+            "en": "Anise"
+          },
+          "price": 45,
+          "image_url": "/images/hot drinks/Anise.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "sahlab",
+          "name": {
+            "ar": "سحلب",
+            "en": "Sahlab"
+          },
+          "price": 130,
+          "image_url": "/images/hot drinks/Sahlab.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "special-sahlab",
+          "name": {
+            "ar": "سحلب سبيشل",
+            "en": "Special Sahlab"
+          },
+          "price": 150,
+          "image_url": "/images/hot drinks/Special Sahlab.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 5,
+          "is_published": true
+        }
+      ]
+    },
+    {
+      "slug": "specialty-coffee",
+      "name": {
+        "ar": "القهوة المختصة",
+        "en": "Specialty Coffee"
+      },
+      "subtitle": {
+        "ar": "تحضير دقيق ونكهة استثنائية",
+        "en": "Precise brewing, exceptional flavour"
+      },
+      "sort_order": 1,
+      "is_published": true,
+      "default_image_width": 1254,
+      "default_image_height": 1254,
+      "homepage_image_url": null,
+      "homepage_name": null,
+      "homepage_sort_order": null,
+      "products": [
+        {
+          "slug": "v60",
+          "name": {
+            "ar": "V60",
+            "en": "V60"
+          },
+          "price": 200,
+          "image_url": "/images/special coffee/200 v60.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "aeropress",
+          "name": {
+            "ar": "أيرو برس",
+            "en": "AeroPress"
+          },
+          "price": 180,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 1,
+          "is_published": false
+        },
+        {
+          "slug": "siphon",
+          "name": {
+            "ar": "سايفون",
+            "en": "Siphon"
+          },
+          "price": 200,
+          "image_url": "/images/special coffee/200 سايفون.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "cold-brew",
+          "name": {
+            "ar": "كولد برو",
+            "en": "Cold Brew"
+          },
+          "price": 200,
+          "image_url": "/images/special coffee/200 كولد برو.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 3,
+          "is_published": true
+        }
+      ]
+    },
+    {
+      "slug": "smoothies",
+      "name": {
+        "ar": "السموذي",
+        "en": "Smoothies"
+      },
+      "subtitle": {
+        "ar": "نكهات خفيفة ومنعشة",
+        "en": "Light, refreshing flavours"
+      },
+      "sort_order": 6,
+      "is_published": true,
+      "default_image_width": 1537,
+      "default_image_height": 1023,
+      "homepage_image_url": "/images/smoothie/Strawberry Smoothie.png",
+      "homepage_name": {
+        "ar": "السموذي",
+        "en": "Smoothies"
+      },
+      "homepage_sort_order": 5,
+      "products": [
+        {
+          "slug": "kiwi-smoothie",
+          "name": {
+            "ar": "كيوي",
+            "en": "Kiwi Smoothie"
+          },
+          "price": 200,
+          "image_url": "/images/smoothie/Kiwi Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "mango-smoothie",
+          "name": {
+            "ar": "مانجو",
+            "en": "Mango Smoothie"
+          },
+          "price": 170,
+          "image_url": "/images/smoothie/Mango Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "strawberry-smoothie",
+          "name": {
+            "ar": "فراولة",
+            "en": "Strawberry Smoothie"
+          },
+          "price": 170,
+          "image_url": "/images/smoothie/Strawberry Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "watermelon-smoothie",
+          "name": {
+            "ar": "بطيخ",
+            "en": "Watermelon Smoothie"
+          },
+          "price": 170,
+          "image_url": "/images/smoothie/Watermelon Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "blueberry-smoothie",
+          "name": {
+            "ar": "بلو بيري",
+            "en": "Blueberry Smoothie"
+          },
+          "price": 170,
+          "image_url": "/images/smoothie/Blueberry Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-smoothie",
+          "name": {
+            "ar": "ليمون",
+            "en": "Lemon Smoothie"
+          },
+          "price": 170,
+          "image_url": "/images/smoothie/Lemon Smoothie.png",
+          "image_width": 1537,
+          "image_height": 1023,
+          "sort_order": 5,
+          "is_published": true
+        }
+      ]
+    },
+    {
+      "slug": "shisha",
+      "name": {
+        "ar": "الشيشة",
+        "en": "Shisha"
+      },
+      "subtitle": {
+        "ar": "مزاج المساء في نيولا",
+        "en": "Niola's evening ritual"
+      },
+      "sort_order": 9,
+      "is_published": true,
+      "default_image_width": 1254,
+      "default_image_height": 1254,
+      "homepage_image_url": "/images/shisha/Shisha.png",
+      "homepage_name": {
+        "ar": "الشيشة",
+        "en": "Shisha"
+      },
+      "homepage_sort_order": 8,
+      "products": [
+        {
+          "slug": "shisha",
+          "name": {
+            "ar": "شيشة",
+            "en": "Shisha"
+          },
+          "price": 370,
+          "image_url": "/images/shisha/Shisha.png",
+          "image_width": 1122,
+          "image_height": 1402,
+          "sort_order": 0,
+          "is_published": true
+        },
+        {
+          "slug": "shisha-hose",
+          "name": {
+            "ar": "لي",
+            "en": "Shisha Hose"
+          },
+          "price": 50,
+          "image_url": "/images/shisha/shisha ly.png",
+          "image_width": 1254,
+          "image_height": 1254,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "salloum-shisha",
+          "name": {
+            "ar": "شيشة معسل (سلوم)",
+            "en": "Salloum Shisha"
+          },
+          "price": 160,
+          "image_url": "/images/shisha/Shisha masul.png",
+          "image_width": 1535,
+          "image_height": 1024,
+          "sort_order": 2,
+          "is_published": true
+        }
+      ]
+    }
+  ],
+  "gallery": [
+    {
+      "slug": "nile-view",
+      "legacy_key": "nileView",
+      "label": {
+        "ar": "إطلالة على النيل",
+        "en": "A View of the Nile"
+      },
+      "alt": {
+        "ar": "إطلالة نيولا الليلية على النيل وأفق القاهرة",
+        "en": "Niola's nighttime view of the Nile and Cairo skyline"
+      },
+      "image_url": "/images/gallary/A view of the Nile.jpeg",
+      "image_width": 1536,
+      "image_height": 864,
+      "layout": "nile-view",
+      "object_position": "50% 50%",
+      "sort_order": 0,
+      "is_published": true
+    },
+    {
+      "slug": "luxurious-atmosphere",
+      "legacy_key": "luxuriousAtmosphere",
+      "label": {
+        "ar": "أجواء فاخرة",
+        "en": "Refined Atmosphere"
+      },
+      "alt": {
+        "ar": "تفاصيل من أجواء نيولا الداخلية الفاخرة",
+        "en": "Details of Niola's refined interior atmosphere"
+      },
+      "image_url": "/images/gallary/luxurious_atmosphere.png",
+      "image_width": 1204,
+      "image_height": 1306,
+      "layout": "luxurious-atmosphere",
+      "object_position": "52% 58%",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "slug": "niola-coffee",
+      "legacy_key": "niolaCoffee",
+      "label": {
+        "ar": "قهوة نيولا",
+        "en": "Niola Coffee"
+      },
+      "alt": {
+        "ar": "قهوة مقدّمة في أجواء نيولا",
+        "en": "Coffee served in the atmosphere of Niola"
+      },
+      "image_url": "/images/gallary/Niola_Coffee.png",
+      "image_width": 1220,
+      "image_height": 1289,
+      "layout": "niola-coffee",
+      "object_position": "49% 56%",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "slug": "niola-day-out",
+      "legacy_key": "niolaDayOut",
+      "label": {
+        "ar": "يوم في نيولا",
+        "en": "A Day at Niola"
+      },
+      "alt": {
+        "ar": "لحظة نهارية في نيولا لاونج",
+        "en": "A daytime moment at Niola Lounge"
+      },
+      "image_url": "/images/gallary/Niola_DAYOUT.png",
+      "image_width": 941,
+      "image_height": 1672,
+      "layout": "niola-dayout",
+      "object_position": "50% 44%",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "slug": "niola-nile",
+      "legacy_key": "niolaNile",
+      "label": {
+        "ar": "نيولا والنيل",
+        "en": "Niola by the Nile"
+      },
+      "alt": {
+        "ar": "جلسة نيولا المطلة على نهر النيل",
+        "en": "Niola's lounge seating overlooking the River Nile"
+      },
+      "image_url": "/images/gallary/Niola_Nile.png",
+      "image_width": 941,
+      "image_height": 1672,
+      "layout": "niola-nile",
+      "object_position": "50% 48%",
+      "sort_order": 4,
+      "is_published": true
+    },
+    {
+      "slug": "special-times",
+      "legacy_key": "specialTimes",
+      "label": {
+        "ar": "أوقات خاصة",
+        "en": "Special Moments"
+      },
+      "alt": {
+        "ar": "جلسة خاصة ودافئة في نيولا لاونج",
+        "en": "A warm, private seating area at Niola Lounge"
+      },
+      "image_url": "/images/gallary/Special_Times.png",
+      "image_width": 1254,
+      "image_height": 1254,
+      "layout": "special-times",
+      "object_position": "56% 68%",
+      "sort_order": 5,
+      "is_published": true
+    }
+  ]
+}
