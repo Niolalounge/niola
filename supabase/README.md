@@ -61,6 +61,17 @@ node scripts/generate-seed.mjs     # -> migrations/0002_seed_content.sql
 a hand-maintained map, which is how it caught `red-tea-pot` being recorded as 1402×1122 when the
 file is 1400×1123.
 
+To check the database still matches that file — after a migration, a bulk edit, or when something
+on the site looks wrong:
+
+```bash
+DATABASE_URL="…" node scripts/verify-content.mjs            # report differences, exit 1 if any
+DATABASE_URL="…" node scripts/verify-content.mjs --repair   # write the source values back
+```
+
+It compares every field of every category, product and gallery item, and lists products that exist
+only in the database because someone added them through the dashboard.
+
 To push the same content over the REST API instead of running SQL:
 
 ```bash
@@ -73,6 +84,16 @@ SUPABASE_SERVICE_ROLE_KEY=<secret> \
 
 `/admin` on the site itself. Sign in with the email and password of an account listed in
 `admin_users`, and you can edit prices, add products with a photograph, and hide or show items.
+
+One category is on screen at a time — the sidebar picks it, and 115 rows at once is what made the
+first version unreadable. Above it, four counters (total, visible, hidden, without a photo) and:
+
+- **Search** — types across the *whole* menu, not just the open category, so you do not have to
+  remember where a product is filed. Arabic letter forms are folded, so `اسبريسو` finds `إسبريسو`
+  and `شاى` finds `شاي`. English names match too.
+- **Filters** — all / visible / hidden / without a photo. They combine with the search.
+
+Adding a product belongs to a category, so that panel only appears when you are looking at one.
 
 Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
 effect on their next request rather than whenever their session expires:

@@ -18,23 +18,68 @@ const text = {
   signingIn: 'جارٍ الدخول…',
   notAdmin: 'هذا الحساب ليس له صلاحية تعديل المنيو.',
   loading: 'جارٍ التحميل…',
+  retry: 'إعادة المحاولة',
   price: 'السعر',
   currency: 'ج.م',
+  product: 'المنتج',
+  photo: 'الصورة',
+  status: 'الحالة',
   visible: 'ظاهر',
   hidden: 'مخفي',
   addProduct: 'إضافة منتج',
   nameAr: 'الاسم بالعربية',
   nameEn: 'الاسم بالإنجليزية',
-  photo: 'الصورة',
   save: 'حفظ',
   saving: 'جارٍ الحفظ…',
   saved: 'تم الحفظ',
   cancel: 'إلغاء',
   remove: 'حذف',
-  confirmRemove: 'حذف هذا المنتج نهائياً؟',
+  confirmRemove: (name) => `حذف «${name}» نهائياً؟`,
   changePhoto: 'تغيير الصورة',
-  needsPhoto: 'يحتاج صورة قبل إظهاره',
-  summary: (visible, total) => `${visible} ظاهر من ${total}`,
+  addPhoto: 'إضافة صورة',
+  needsPhoto: 'يحتاج صورة',
+  search: 'ابحث في كل المنيو…',
+  clearSearch: 'مسح البحث',
+  searchResults: 'نتائج البحث في كل التصنيفات',
+  noResults: 'لا توجد نتائج مطابقة.',
+  emptyCategory: 'لا توجد منتجات في هذا التصنيف بعد.',
+  categories: 'التصنيفات',
+  filters: {
+    all: 'الكل',
+    visible: 'الظاهر',
+    hidden: 'المخفي',
+    nophoto: 'بلا صورة',
+  },
+  stats: {
+    total: 'منتج',
+    visible: 'ظاهر',
+    hidden: 'مخفي',
+    nophoto: 'بلا صورة',
+  },
+  showing: (shown, total) => `${shown} من ${total}`,
+}
+
+/**
+ * Arabic is written with several interchangeable letter forms, and product names are entered by
+ * hand. Folding them means typing "شاي كرك" finds "شاى كرك" and "إسبريسو" finds "اسبريسو".
+ */
+function fold(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/[ً-ْٰـ]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .trim()
+}
+
+const FILTERS = {
+  all: () => true,
+  visible: (product) => product.is_published,
+  hidden: (product) => !product.is_published,
+  nophoto: (product) => !product.image_url,
 }
 
 function useSignedInAdmin() {
@@ -76,6 +121,7 @@ function SignIn() {
 
   return (
     <form className="admin-signin" onSubmit={submit}>
+      <p className="admin-signin__mark">NIOLA</p>
       <h1>{text.title}</h1>
       <label>
         <span>{text.email}</span>
@@ -91,7 +137,7 @@ function SignIn() {
   )
 }
 
-function ProductRow({ product, onChange, onRemove }) {
+function ProductRow({ product, categoryName, onChange, onRemove }) {
   const [price, setPrice] = useState(String(product.price))
   // The checkbox answers the click immediately and only falls back to the stored value if the
   // write fails; without this it snaps back for the length of the round trip and reads as broken.
@@ -131,13 +177,18 @@ function ProductRow({ product, onChange, onRemove }) {
   const canPublish = Boolean(product.image_url)
 
   return (
-    <tr className={product.is_published ? undefined : 'is-hidden-row'}>
+    <tr className={published ? undefined : 'is-hidden-row'}>
       <td className="admin-cell-photo">
-        {product.image_url
-          ? <img src={product.image_url} alt="" width="56" height="56" loading="lazy" />
-          : <span className="admin-photo-empty" aria-hidden="true" />}
-        <button type="button" className="admin-link" onClick={() => fileRef.current?.click()}>
-          {product.image_url ? text.changePhoto : text.photo}
+        <button
+          type="button"
+          className="admin-thumb"
+          onClick={() => fileRef.current?.click()}
+          title={product.image_url ? text.changePhoto : text.addPhoto}
+        >
+          {product.image_url
+            ? <img src={product.image_url} alt="" width="48" height="48" loading="lazy" />
+            : <span className="admin-thumb__empty" aria-hidden="true">+</span>}
+          <span className="admin-thumb__overlay">{product.image_url ? text.changePhoto : text.addPhoto}</span>
         </button>
         <input
           ref={fileRef}
@@ -151,26 +202,32 @@ function ProductRow({ product, onChange, onRemove }) {
           }}
         />
       </td>
-      <td>
+
+      <td className="admin-cell-name">
         <strong>{product.name_ar}</strong>
         <span className="admin-name-en" dir="ltr">{product.name_en}</span>
+        {categoryName && <span className="admin-name-category">{categoryName}</span>}
       </td>
+
       <td className="admin-cell-price">
-        <input
-          type="number"
-          min="0"
-          step="1"
-          value={price}
-          dir="ltr"
-          onChange={(event) => setPrice(event.target.value)}
-          onBlur={commitPrice}
-          onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
-          aria-label={`${text.price} — ${product.name_ar}`}
-        />
-        <span>{text.currency}</span>
+        <span className="admin-field">
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={price}
+            dir="ltr"
+            onChange={(event) => setPrice(event.target.value)}
+            onBlur={commitPrice}
+            onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
+            aria-label={`${text.price} — ${product.name_ar}`}
+          />
+          <span className="admin-field__suffix">{text.currency}</span>
+        </span>
       </td>
+
       <td className="admin-cell-visible">
-        <label className="admin-toggle">
+        <label className={`admin-switch${published ? ' is-on' : ''}${!canPublish && !published ? ' is-locked' : ''}`}>
           <input
             type="checkbox"
             checked={published}
@@ -182,29 +239,39 @@ function ProductRow({ product, onChange, onRemove }) {
               if (!saved) setPublished(product.is_published)
             }}
           />
-          <span>{published ? text.visible : text.hidden}</span>
+          <span className="admin-switch__track" aria-hidden="true"><span /></span>
+          <span className="admin-switch__label">
+            {!canPublish && !published ? text.needsPhoto : (published ? text.visible : text.hidden)}
+          </span>
         </label>
-        {!canPublish && !published && <span className="admin-hint">{text.needsPhoto}</span>}
       </td>
+
       <td className="admin-cell-state">
         {state === 'saving' && <span className="admin-state">{text.saving}</span>}
-        {state === 'saved' && <span className="admin-state is-ok">{text.saved}</span>}
+        {state === 'saved' && <span className="admin-state is-ok">✓ {text.saved}</span>}
         {error && <span className="admin-error" role="alert">{error}</span>}
       </td>
-      <td>
+
+      <td className="admin-cell-remove">
         <button
           type="button"
-          className="admin-link is-danger"
-          onClick={() => { if (window.confirm(text.confirmRemove)) run(async () => { await deleteProduct(product.id); onRemove(product.id); return null }) }}
+          className="admin-icon-button"
+          title={text.remove}
+          aria-label={`${text.remove} — ${product.name_ar}`}
+          onClick={() => {
+            if (window.confirm(text.confirmRemove(product.name_ar))) {
+              run(async () => { await deleteProduct(product.id); onRemove(product.id); return null })
+            }
+          }}
         >
-          {text.remove}
+          ✕
         </button>
       </td>
     </tr>
   )
 }
 
-function AddProduct({ categoryId, onCreated }) {
+function AddProduct({ categoryId, categoryName, onCreated }) {
   const [open, setOpen] = useState(false)
   const [nameAr, setNameAr] = useState('')
   const [nameEn, setNameEn] = useState('')
@@ -239,33 +306,36 @@ function AddProduct({ categoryId, onCreated }) {
   if (!open) {
     return (
       <button type="button" className="admin-add-trigger" onClick={() => setOpen(true)}>
-        + {text.addProduct}
+        <span aria-hidden="true">+</span> {text.addProduct} — {categoryName}
       </button>
     )
   }
 
   return (
     <form className="admin-add" onSubmit={submit}>
-      <label>
-        <span>{text.nameAr}</span>
-        <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required />
-      </label>
-      <label>
-        <span>{text.nameEn}</span>
-        <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" />
-      </label>
-      <label>
-        <span>{text.price}</span>
-        <input type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} required dir="ltr" />
-      </label>
-      <label>
-        <span>{text.photo}</span>
-        <input
-          type="file"
-          accept="image/png,image/jpeg,image/webp,image/avif"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        />
-      </label>
+      <p className="admin-add__title">{text.addProduct} — {categoryName}</p>
+      <div className="admin-add__grid">
+        <label>
+          <span>{text.nameAr}</span>
+          <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required />
+        </label>
+        <label>
+          <span>{text.nameEn}</span>
+          <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" />
+        </label>
+        <label>
+          <span>{text.price}</span>
+          <input type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} required dir="ltr" />
+        </label>
+        <label>
+          <span>{text.photo}</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/avif"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </label>
+      </div>
       {error && <p className="admin-error" role="alert">{error}</p>}
       <div className="admin-add__actions">
         <button type="submit" disabled={busy}>{busy ? text.saving : text.save}</button>
@@ -275,29 +345,47 @@ function AddProduct({ categoryId, onCreated }) {
   )
 }
 
+function Stat({ value, label, tone }) {
+  return (
+    <div className={`admin-stat${tone ? ` is-${tone}` : ''}`}>
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </div>
+  )
+}
+
 function Dashboard({ email }) {
   const [categories, setCategories] = useState(null)
   const [error, setError] = useState(null)
+  const [activeId, setActiveId] = useState(null)
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState('all')
 
-  useEffect(() => {
-    loadMenu().then(setCategories).catch((cause) => setError(cause.message))
+  const load = useCallback(() => {
+    setError(null)
+    loadMenu()
+      .then((data) => {
+        setCategories(data)
+        setActiveId((current) => current ?? data[0]?.id ?? null)
+      })
+      .catch((cause) => setError(cause.message))
   }, [])
 
-  const replaceProduct = useCallback((categoryId, updated) => {
+  useEffect(load, [load])
+
+  const replaceProduct = useCallback((updated) => {
     if (!updated) return
-    setCategories((current) => current.map((category) => (
-      category.id === categoryId
-        ? { ...category, products: category.products.map((p) => (p.id === updated.id ? { ...p, ...updated } : p)) }
-        : category
-    )))
+    setCategories((current) => current.map((category) => ({
+      ...category,
+      products: category.products.map((p) => (p.id === updated.id ? { ...p, ...updated } : p)),
+    })))
   }, [])
 
-  const removeProduct = useCallback((categoryId, productId) => {
-    setCategories((current) => current.map((category) => (
-      category.id === categoryId
-        ? { ...category, products: category.products.filter((p) => p.id !== productId) }
-        : category
-    )))
+  const removeProduct = useCallback((productId) => {
+    setCategories((current) => current.map((category) => ({
+      ...category,
+      products: category.products.filter((p) => p.id !== productId),
+    })))
   }, [])
 
   const addProduct = useCallback((categoryId, created) => {
@@ -308,21 +396,63 @@ function Dashboard({ email }) {
     )))
   }, [])
 
-  const totals = useMemo(() => {
+  const stats = useMemo(() => {
     if (!categories) return null
     const all = categories.flatMap((category) => category.products)
-    return { visible: all.filter((p) => p.is_published).length, total: all.length }
+    return {
+      total: all.length,
+      visible: all.filter((p) => p.is_published).length,
+      hidden: all.filter((p) => !p.is_published).length,
+      nophoto: all.filter((p) => !p.image_url).length,
+    }
   }, [categories])
 
-  if (error) return <p className="admin-error">{error}</p>
-  if (!categories) return <p className="admin-state">{text.loading}</p>
+  const searching = query.trim().length > 0
+
+  /**
+   * Only one category is on screen at a time — 115 rows at once is what made this unreadable.
+   * A search is the exception: it looks across the whole menu, because otherwise finding a
+   * product means remembering which category it is filed under.
+   */
+  const visibleRows = useMemo(() => {
+    if (!categories) return []
+    const matchesFilter = FILTERS[filter]
+
+    if (searching) {
+      const needle = fold(query)
+      return categories.flatMap((category) => category.products
+        .filter((product) => matchesFilter(product))
+        .filter((product) => fold(product.name_ar).includes(needle) || fold(product.name_en).includes(needle))
+        .map((product) => ({ product, categoryName: category.name_ar })))
+    }
+
+    const active = categories.find((category) => category.id === activeId)
+    return (active?.products ?? [])
+      .filter((product) => matchesFilter(product))
+      .map((product) => ({ product, categoryName: null }))
+  }, [categories, activeId, query, filter, searching])
+
+  if (error) {
+    return (
+      <div className="admin-empty">
+        <p className="admin-error">{error}</p>
+        <button type="button" onClick={load}>{text.retry}</button>
+      </div>
+    )
+  }
+  if (!categories) return <p className="admin-state admin-state--page">{text.loading}</p>
+
+  const active = categories.find((category) => category.id === activeId)
+  const totalInScope = searching
+    ? categories.flatMap((c) => c.products).length
+    : (active?.products.length ?? 0)
 
   return (
     <div className="admin-dashboard">
       <header className="admin-header">
-        <div>
+        <div className="admin-header__title">
+          <p className="admin-header__mark">NIOLA</p>
           <h1>{text.title}</h1>
-          {totals && <p>{text.summary(totals.visible, totals.total)}</p>}
         </div>
         <div className="admin-header__account">
           <span dir="ltr">{email}</span>
@@ -330,29 +460,113 @@ function Dashboard({ email }) {
         </div>
       </header>
 
-      {categories.map((category) => (
-        <section key={category.id} className="admin-category">
-          <h2>
-            {category.name_ar}
-            <span>{category.products.filter((p) => p.is_published).length} / {category.products.length}</span>
-          </h2>
+      {stats && (
+        <div className="admin-stats">
+          <Stat value={stats.total} label={text.stats.total} />
+          <Stat value={stats.visible} label={text.stats.visible} tone="ok" />
+          <Stat value={stats.hidden} label={text.stats.hidden} tone="muted" />
+          <Stat value={stats.nophoto} label={text.stats.nophoto} tone="warn" />
+        </div>
+      )}
 
-          <table className="admin-table">
-            <tbody>
-              {category.products.map((product) => (
-                <ProductRow
-                  key={product.id}
-                  product={product}
-                  onChange={(updated) => replaceProduct(category.id, updated)}
-                  onRemove={(id) => removeProduct(category.id, id)}
-                />
+      <div className="admin-layout">
+        <nav className="admin-sidebar" aria-label={text.categories}>
+          <p className="admin-sidebar__title">{text.categories}</p>
+          <ul>
+            {categories.map((category) => {
+              const shown = category.products.filter((p) => p.is_published).length
+              return (
+                <li key={category.id}>
+                  <button
+                    type="button"
+                    className={!searching && category.id === activeId ? 'is-active' : undefined}
+                    aria-current={!searching && category.id === activeId ? 'true' : undefined}
+                    onClick={() => { setActiveId(category.id); setQuery('') }}
+                  >
+                    <span>{category.name_ar}</span>
+                    <span className="admin-sidebar__count">{shown}/{category.products.length}</span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+
+        <section className="admin-panel">
+          <div className="admin-toolbar">
+            <div className="admin-search">
+              <input
+                type="search"
+                value={query}
+                placeholder={text.search}
+                onChange={(event) => setQuery(event.target.value)}
+                aria-label={text.search}
+              />
+              {searching && (
+                <button type="button" className="admin-icon-button" onClick={() => setQuery('')} aria-label={text.clearSearch}>✕</button>
+              )}
+            </div>
+
+            <div className="admin-filters" role="group" aria-label={text.status}>
+              {Object.keys(FILTERS).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={filter === key ? 'is-active' : undefined}
+                  aria-pressed={filter === key}
+                  onClick={() => setFilter(key)}
+                >
+                  {text.filters[key]}
+                </button>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
 
-          <AddProduct categoryId={category.id} onCreated={(created) => addProduct(category.id, created)} />
+          <p className="admin-scope">
+            {searching ? text.searchResults : active?.name_ar}
+            <span>{text.showing(visibleRows.length, totalInScope)}</span>
+          </p>
+
+          {visibleRows.length === 0 ? (
+            <p className="admin-state admin-state--empty">
+              {searching || filter !== 'all' ? text.noResults : text.emptyCategory}
+            </p>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">{text.photo}</th>
+                  <th scope="col">{text.product}</th>
+                  <th scope="col">{text.price}</th>
+                  <th scope="col">{text.status}</th>
+                  <th scope="col"><span className="visually-hidden">{text.saved}</span></th>
+                  <th scope="col"><span className="visually-hidden">{text.remove}</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map(({ product, categoryName }) => (
+                  <ProductRow
+                    key={product.id}
+                    product={product}
+                    categoryName={categoryName}
+                    onChange={replaceProduct}
+                    onRemove={removeProduct}
+                  />
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* A new product has to belong to a category, and a search spans all of them. */}
+          {!searching && active && (
+            <AddProduct
+              categoryId={active.id}
+              categoryName={active.name_ar}
+              onCreated={(created) => addProduct(active.id, created)}
+            />
+          )}
         </section>
-      ))}
+      </div>
     </div>
   )
 }
@@ -376,9 +590,9 @@ export default function Admin() {
 
   return (
     <div className="admin-page">
-      {session === undefined && <p className="admin-state">{text.loading}</p>}
+      {session === undefined && <p className="admin-state admin-state--page">{text.loading}</p>}
       {session === null && <SignIn />}
-      {session && isAdmin === null && <p className="admin-state">{text.loading}</p>}
+      {session && isAdmin === null && <p className="admin-state admin-state--page">{text.loading}</p>}
       {session && isAdmin === false && (
         <div className="admin-signin">
           <p className="admin-error">{text.notAdmin}</p>
