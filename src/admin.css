@@ -209,7 +209,7 @@
 }
 .admin-table tbody tr { transition: background 0.15s; }
 .admin-table tbody tr:hover { background: rgba(216, 179, 106, 0.05); }
-.admin-table tr.is-hidden-row .admin-cell-name strong,
+.admin-table tr.is-hidden-row .admin-name-field,
 .admin-table tr.is-hidden-row .admin-thumb { opacity: 0.45; }
 
 .admin-cell-photo { width: 3.6rem; }
@@ -229,8 +229,26 @@
 }
 .admin-thumb:hover .admin-thumb__overlay, .admin-thumb:focus-visible .admin-thumb__overlay { opacity: 1; }
 
-.admin-cell-name strong { display: block; font-weight: 600; }
-.admin-name-en { display: block; font-size: 0.7rem; color: var(--latte-sand); }
+/* The names are editable, but the table is read far more often than it is edited, so the fields
+   are quiet until you reach for one: no border, no fill, the same weight and size the plain text
+   had. Otherwise 26 rows read as a wall of form controls rather than as a menu. */
+.admin-page .admin-cell-name .admin-name-field {
+  display: block; width: 100%;
+  padding: 0.18rem 0.35rem;
+  border: 1px solid transparent; border-radius: 6px;
+  background: none; color: var(--warm-ivory);
+  font: inherit; font-size: 0.85rem; font-weight: 600;
+  transition: border-color 0.15s, background 0.15s;
+}
+.admin-page .admin-cell-name .admin-name-field--en {
+  font-size: 0.7rem; font-weight: 400; color: var(--latte-sand);
+}
+.admin-page .admin-cell-name .admin-name-field:hover {
+  border-color: var(--admin-line); background: rgba(15, 12, 10, 0.45);
+}
+.admin-page .admin-cell-name .admin-name-field:focus {
+  border-color: var(--admin-line-strong); background: rgba(15, 12, 10, 0.7);
+}
 .admin-name-category {
   display: inline-block; margin-top: 0.2rem; padding: 0.05rem 0.4rem;
   border-radius: 20px; background: rgba(216, 179, 106, 0.12);
@@ -383,6 +401,65 @@
   color: var(--latte-sand); border-color: transparent; background: none;
 }
 
+/* ---- reordering ---- */
+
+.admin-drag-handle {
+  display: inline-grid; place-items: center;
+  width: 1.6rem; height: 1.9rem; padding: 0;
+  border: 0; border-radius: 6px;
+  background: none; color: var(--latte-sand);
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+  /* Without this the browser claims the gesture for scrolling and no pointermove ever arrives,
+     which is the whole reason a touch drag silently does nothing. */
+  touch-action: none;
+}
+.admin-drag-handle:hover { opacity: 1; color: var(--champagne-gold); background: rgba(216, 179, 106, 0.1); }
+.admin-drag-handle:focus-visible { opacity: 1; color: var(--champagne-gold); }
+.admin-drag-handle:active { cursor: grabbing; }
+
+.admin-cell-drag { width: 1.9rem; }
+
+/* Text selection turns a drag into a highlight the moment the pointer leaves the handle. */
+.admin-table:has(tr.is-dragging),
+.admin-category-list:has(.is-dragging) { user-select: none; }
+
+/* Lifting the row off the list: it is the only thing following the finger, so it has to read as
+   detached from the rows it is passing over. */
+.admin-table tr.is-dragging,
+.admin-category.is-dragging {
+  position: relative; z-index: 3;
+  border-radius: 10px;
+  background: var(--admin-surface-raised);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+}
+.admin-table tr.is-dragging { outline: 1px solid var(--admin-line-strong); }
+.admin-category.is-dragging { border-color: var(--champagne-gold); }
+.admin-table tbody tr.is-dragging:hover { background: var(--admin-surface-raised); }
+.admin-table tr.is-dragging .admin-drag-handle,
+.admin-category.is-dragging .admin-drag-handle { opacity: 1; color: var(--champagne-gold); }
+
+/* Where it would land. On a table the line is drawn per cell, since a tr cannot carry a border
+   of its own once border-collapse is on; the cells' lines meet and read as one. */
+.admin-table tr.is-drop-before td { box-shadow: inset 0 2px 0 var(--champagne-gold); }
+.admin-table tr.is-drop-after td { box-shadow: inset 0 -2px 0 var(--champagne-gold); }
+.admin-category.is-drop-before { box-shadow: inset 0 3px 0 var(--champagne-gold); }
+.admin-category.is-drop-after { box-shadow: inset 0 -3px 0 var(--champagne-gold); }
+
+.admin-scope__note {
+  font-family: var(--body-font); font-size: 0.7rem;
+  color: #e0b062; margin-inline-start: auto;
+}
+
+/* The handle sits alongside the whole card rather than inside its first row. */
+.admin-category {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
+.admin-category > .admin-drag-handle { grid-row: 1 / -1; align-self: center; }
+.admin-category__fields, .admin-category__foot { grid-column: 2; }
+
 /* ---- narrow screens ---- */
 
 @media (max-width: 900px) {
@@ -459,6 +536,29 @@
 
   .admin-table td { display: block; border: 0; padding: 0; width: auto; }
 
+  /* The card layout gains a rail on the start side for the handle, spanning both of its rows so
+     it can be grabbed wherever the thumb lands. */
+  .admin-table tr {
+    grid-template-columns: 1.6rem 56px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'drag photo name   remove'
+      'drag photo price  toggle';
+  }
+  .admin-cell-drag { grid-area: drag; align-self: center; width: auto; }
+  .admin-drag-handle { width: 1.6rem; height: 2.6rem; opacity: 0.75; }
+  /* Once the row is a card rather than a table row, the per-cell landing line breaks into one
+     dash per cell. The card itself can carry a border, so it draws the line instead. */
+  .admin-table tr.is-drop-before td,
+  .admin-table tr.is-drop-after td { box-shadow: none; }
+  .admin-table tr.is-drop-before { box-shadow: inset 0 3px 0 var(--champagne-gold); }
+  .admin-table tr.is-drop-after { box-shadow: inset 0 -3px 0 var(--champagne-gold); }
+
+  /* The hint is a sentence, and squeezing it between the category name and the count leaves
+     three columns of two words each. */
+  .admin-scope { flex-wrap: wrap; }
+  .admin-scope__note { flex-basis: 100%; margin-inline-start: 0; }
+
+
   .admin-cell-photo { grid-area: photo; align-self: start; }
   .admin-thumb { width: 56px; height: 56px; }
   /* There is no hover on a touch screen, so the change-photo hint has to be permanent. */
@@ -468,7 +568,10 @@
   }
 
   .admin-cell-name { grid-area: name; }
-  .admin-cell-name strong { font-size: 0.95rem; }
+  /* 1rem is the threshold below which iOS zooms the page on focus, and the product name is the
+     field most likely to be tapped on a phone. */
+  .admin-page .admin-cell-name .admin-name-field { font-size: 1rem; padding-block: 0.3rem; }
+  .admin-page .admin-cell-name .admin-name-field--en { font-size: 0.8rem; }
 
   .admin-cell-price { grid-area: price; }
   .admin-field input[type='number'] { width: 4.6rem; padding-block: 0.55rem; font-size: 0.95rem; }

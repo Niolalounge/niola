@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '../admin.css'
 import { adminClient } from '../lib/adminClient'
+import { useDragOrder } from '../hooks/useDragOrder'
 import {
   createCategory,
   createProduct,
   deleteCategory,
   deleteProduct,
   loadMenu,
+  reorderCategories,
+  reorderProducts,
   setProductImage,
   subscribeToMenuChanges,
   updateCategory,
@@ -52,6 +55,9 @@ const text = {
   emptyCategory: 'لا توجد منتجات في هذا التصنيف بعد.',
   categories: 'التصنيفات',
   manageCategories: 'إدارة التصنيفات',
+  reorder: 'اسحب لتغيير الترتيب',
+  reorderLocked: 'الترتيب متاح على القائمة كاملة — أغلق البحث والتصفية',
+  reorderFailed: 'تعذّر حفظ الترتيب',
   addCategory: 'إضافة تصنيف',
   subtitleAr: 'الوصف بالعربية',
   subtitleEn: 'الوصف بالإنجليزية',
@@ -138,6 +144,72 @@ function useRowSave(onChange) {
   return { state, error, run }
 }
 
+/** Drawn rather than typed: a braille or box-drawing grip glyph is at the mercy of the font. */
+function DragGrip() {
+  return (
+    <svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true" focusable="false">
+      {[3, 8, 13].map((y) => [2.5, 7.5].map((x) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.35" fill="currentColor" />
+      )))}
+    </svg>
+  )
+}
+
+/**
+ * The control that starts a drag, and moves the row on its own with the arrow keys.
+ *
+ * A button, not a decorated div: reordering has to be reachable without a pointer, and a real
+ * button gets focus, the keyboard and a screen-reader role for free.
+ */
+function DragHandle({ label, ...props }) {
+  return (
+    <button type="button" className="admin-drag-handle" title={text.reorder} aria-label={label} {...props}>
+      <DragGrip />
+    </button>
+  )
+}
+
+/**
+ * Text fields that edit a stored record in place and save on blur, the way the price does.
+ *
+ * Two things it has to get right. Stored values win, so another administrator's rename appears
+ * here — except in the field being typed into at this moment: saving the Arabic name returns a
+ * fresh row a moment after the cursor has moved on to the English one, and without that guard it
+ * lands on top of the half-typed word there. And a name the database requires cannot be cleared,
+ * so a blank one puts the stored value back instead of failing the write.
+ */
+function useDraftFields({ record, run, save }) {
+  const [draft, setDraft] = useState(record)
+  const editingRef = useRef(null)
+
+  useEffect(() => {
+    setDraft((current) => {
+      const editing = editingRef.current
+      return editing ? { ...record, [editing]: current[editing] } : record
+    })
+  }, [record])
+
+  const commit = (name, required) => {
+    const next = draft[name]?.trim() ?? ''
+    const stored = record[name] ?? ''
+    if (next === stored) return
+    if (required && !next) {
+      setDraft((current) => ({ ...current, [name]: record[name] }))
+      return
+    }
+    run(() => save({ [name]: next === '' ? null : next }))
+  }
+
+  return (name, { required = false, ltr = false } = {}) => ({
+    value: draft[name] ?? '',
+    dir: ltr ? 'ltr' : undefined,
+    onChange: (event) => setDraft((current) => ({ ...current, [name]: event.target.value })),
+    onFocus: () => { editingRef.current = name },
+    onBlur: () => { editingRef.current = null; commit(name, required) },
+    onKeyDown: (event) => { if (event.key === 'Enter') event.currentTarget.blur() },
+  })
+}
+
 function useSignedInAdmin() {
   const [session, setSession] = useState(undefined)
   const [isAdmin, setIsAdmin] = useState(null)
@@ -193,13 +265,22 @@ function SignIn() {
   )
 }
 
-function ProductRow({ product, categoryName, onChange, onRemove }) {
+function ProductRow({ product, categoryName, onChange, onRemove, drag, canReorder }) {
   const [price, setPrice] = useState(String(product.price))
   // The checkbox answers the click immediately and only falls back to the stored value if the
   // write fails; without this it snaps back for the length of the round trip and reads as broken.
   const [published, setPublished] = useState(product.is_published)
   const { state, error, run } = useRowSave(onChange)
   const fileRef = useRef(null)
+  // Stable, so a re-render mid-drag does not unregister the row the drag is measuring against.
+  const setRowRef = useCallback((element) => drag.registerRow(product.id, element), [drag, product.id])
+  const fieldProps = useDraftFields({
+    record: product,
+    run,
+    // The slug is not derived again from the English name: it is what /menu#… and every saved
+    // link point at, so a rename must never move it.
+    save: (changes) => updateProduct(product.id, changes),
+  })
 
   useEffect(() => { setPrice(String(product.price)) }, [product.price])
   useEffect(() => { setPublished(product.is_published) }, [product.is_published])
@@ -214,9 +295,19 @@ function ProductRow({ product, categoryName, onChange, onRemove }) {
   }
 
   const canPublish = Boolean(product.image_url)
+  const dropSide = drag.dropMarker(product.id)
+  const rowClass = [
+    published ? null : 'is-hidden-row',
+    drag.dragId === product.id ? 'is-dragging' : null,
+    dropSide ? `is-drop-${dropSide}` : null,
+  ].filter(Boolean).join(' ') || undefined
 
   return (
-    <tr className={published ? undefined : 'is-hidden-row'}>
+    <tr ref={setRowRef} className={rowClass}>
+      <td className="admin-cell-drag">
+        {canReorder && <DragHandle label={`${text.reorder} — ${product.name_ar}`} {...drag.handleProps(product.id)} />}
+      </td>
+
       <td className="admin-cell-photo">
         <button
           type="button"
@@ -243,8 +334,16 @@ function ProductRow({ product, categoryName, onChange, onRemove }) {
       </td>
 
       <td className="admin-cell-name">
-        <strong>{product.name_ar}</strong>
-        <span className="admin-name-en" dir="ltr">{product.name_en}</span>
+        <input
+          className="admin-name-field"
+          aria-label={`${text.nameAr} — ${product.name_ar}`}
+          {...fieldProps('name_ar', { required: true })}
+        />
+        <input
+          className="admin-name-field admin-name-field--en"
+          aria-label={`${text.nameEn} — ${product.name_ar}`}
+          {...fieldProps('name_en', { required: true, ltr: true })}
+        />
         {categoryName && <span className="admin-name-category">{categoryName}</span>}
       </td>
 
@@ -432,57 +531,39 @@ function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCrea
  * should not be something thirty products can be lost to by one mis-click. Hiding is the move
  * for "take this off the site", and it leaves every product exactly where it is.
  */
-function CategoryRow({ category, onChange, onRemove }) {
-  const [draft, setDraft] = useState(category)
+function CategoryRow({ category, onChange, onRemove, drag }) {
   const [published, setPublished] = useState(category.is_published)
   const { state, error, run } = useRowSave(onChange)
-  const editingRef = useRef(null)
+  const setRowRef = useCallback((element) => drag.registerRow(category.id, element), [drag, category.id])
+  const fieldProps = useDraftFields({
+    record: category,
+    run,
+    save: (changes) => updateCategory(category.id, changes),
+  })
 
-  /**
-   * Stored values win, so another administrator's rename shows up here — except in the field
-   * being typed into at this moment. Saving the Arabic name returns a fresh row a moment after
-   * the cursor has moved on to the English one, and without this it would land on top of the
-   * half-typed word there.
-   */
-  useEffect(() => {
-    setDraft((current) => {
-      const editing = editingRef.current
-      return editing ? { ...category, [editing]: current[editing] } : category
-    })
-  }, [category])
   useEffect(() => { setPublished(category.is_published) }, [category.is_published])
 
   const productCount = category.products.length
 
-  /** Names are required by the database; a blank one puts the stored value back rather than failing. */
-  const commit = (name, required) => {
-    const next = draft[name]?.trim() ?? ''
-    const stored = category[name] ?? ''
-    if (next === stored) return
-    if (required && !next) {
-      setDraft((current) => ({ ...current, [name]: category[name] }))
-      return
-    }
-    run(() => updateCategory(category.id, { [name]: next === '' ? null : next }))
-  }
-
-  const field = (name, label, { required = false, ltr = false } = {}) => (
+  const field = (name, label, options) => (
     <label>
-      <span>{required ? label : `${label} · ${text.optional}`}</span>
-      <input
-        value={draft[name] ?? ''}
-        dir={ltr ? 'ltr' : undefined}
-        onChange={(event) => setDraft((current) => ({ ...current, [name]: event.target.value }))}
-        onFocus={() => { editingRef.current = name }}
-        onBlur={() => { editingRef.current = null; commit(name, required) }}
-        onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
-        aria-label={`${label} — ${category.name_ar}`}
-      />
+      <span>{options?.required ? label : `${label} · ${text.optional}`}</span>
+      <input aria-label={`${label} — ${category.name_ar}`} {...fieldProps(name, options)} />
     </label>
   )
 
+  const dropSide = drag.dropMarker(category.id)
+  const rowClass = [
+    'admin-category',
+    published ? null : 'is-hidden',
+    drag.dragId === category.id ? 'is-dragging' : null,
+    dropSide ? `is-drop-${dropSide}` : null,
+  ].filter(Boolean).join(' ')
+
   return (
-    <li className={published ? 'admin-category' : 'admin-category is-hidden'}>
+    <li ref={setRowRef} className={rowClass}>
+      <DragHandle label={`${text.reorder} — ${category.name_ar}`} {...drag.handleProps(category.id)} />
+
       <div className="admin-category__fields">
         {field('name_ar', text.nameAr, { required: true })}
         {field('name_en', text.nameEn, { required: true, ltr: true })}
@@ -540,8 +621,9 @@ function CategoryRow({ category, onChange, onRemove }) {
  * something the owner does a few times a year, and it should not cost the product list any of
  * the width it uses every day.
  */
-function ManageCategoriesDialog({ open, categories, onClose, onChange, onRemove, onCreated }) {
+function ManageCategoriesDialog({ open, categories, onClose, onChange, onRemove, onCreated, onReorder }) {
   const dialogRef = useRef(null)
+  const drag = useDragOrder({ ids: categories.map((category) => category.id), onCommit: onReorder })
   const [nameAr, setNameAr] = useState('')
   const [nameEn, setNameEn] = useState('')
   const [busy, setBusy] = useState(false)
@@ -604,7 +686,7 @@ function ManageCategoriesDialog({ open, categories, onClose, onChange, onRemove,
 
         <ul className="admin-category-list">
           {categories.map((category) => (
-            <CategoryRow key={category.id} category={category} onChange={onChange} onRemove={onRemove} />
+            <CategoryRow key={category.id} category={category} onChange={onChange} onRemove={onRemove} drag={drag} />
           ))}
         </ul>
 
@@ -633,6 +715,9 @@ function Dashboard({ email }) {
   const [filter, setFilter] = useState('all')
   const [adding, setAdding] = useState(false)
   const [managing, setManaging] = useState(false)
+  // Separate from the page-level error, which replaces the whole screen. A reorder that
+  // did not save is worth a line above the list, not the loss of everything else on it.
+  const [orderError, setOrderError] = useState(null)
 
   const load = useCallback(() => {
     setError(null)
@@ -708,6 +793,37 @@ function Dashboard({ email }) {
     setQuery('')
   }, [])
 
+  /**
+   * Both of these move the rows on screen first and tell the database after. A reorder is a
+   * gesture — waiting a round trip before the row lands where it was dropped reads as a failed
+   * drag. If the write does fail, the optimistic order was a guess, so the answer is to refetch
+   * rather than to try to reverse it.
+   */
+  const reorderProductsIn = useCallback((categoryId, ids) => {
+    setOrderError(null)
+    setCategories((current) => current.map((category) => {
+      if (category.id !== categoryId) return category
+      const byId = new Map(category.products.map((product) => [product.id, product]))
+      return { ...category, products: ids.map((id) => byId.get(id)).filter(Boolean) }
+    }))
+    reorderProducts(ids).catch((cause) => {
+      setOrderError(cause.message)
+      load()
+    })
+  }, [load])
+
+  const reorderCategoryList = useCallback((ids) => {
+    setOrderError(null)
+    setCategories((current) => {
+      const byId = new Map(current.map((category) => [category.id, category]))
+      return ids.map((id) => byId.get(id)).filter(Boolean)
+    })
+    reorderCategories(ids).catch((cause) => {
+      setOrderError(cause.message)
+      load()
+    })
+  }, [load])
+
   const stats = useMemo(() => {
     if (!categories) return null
     const all = categories.flatMap((category) => category.products)
@@ -751,6 +867,18 @@ function Dashboard({ email }) {
       .filter((product) => matchesFilter(product))
       .map((product) => ({ product, categoryName: null }))
   }, [categories, active, query, filter, searching])
+
+  /**
+   * Only the whole, unfiltered category can be reordered. What a search or a filter shows is a
+   * subset, and dropping row 3 of 5 visible rows says nothing about where it belongs among the
+   * thirty-two that are not.
+   */
+  const canReorder = !searching && filter === 'all'
+  const productDrag = useDragOrder({
+    ids: canReorder ? (active?.products ?? []).map((product) => product.id) : [],
+    onCommit: (ids) => reorderProductsIn(active.id, ids),
+    disabled: !canReorder,
+  })
 
   if (error) {
     return (
@@ -857,7 +985,14 @@ function Dashboard({ email }) {
           <p className="admin-scope">
             {searching ? text.searchResults : active?.name_ar}
             <span>{text.showing(visibleRows.length, totalInScope)}</span>
+            {!canReorder && visibleRows.length > 1 && (
+              <span className="admin-scope__note">{text.reorderLocked}</span>
+            )}
           </p>
+
+          {orderError && (
+            <p className="admin-error" role="alert">{text.reorderFailed} — {orderError}</p>
+          )}
 
           {visibleRows.length === 0 ? (
             <p className="admin-state admin-state--empty">
@@ -867,6 +1002,7 @@ function Dashboard({ email }) {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th scope="col"><span className="visually-hidden">{text.reorder}</span></th>
                   <th scope="col">{text.photo}</th>
                   <th scope="col">{text.product}</th>
                   <th scope="col">{text.price}</th>
@@ -883,6 +1019,8 @@ function Dashboard({ email }) {
                     categoryName={categoryName}
                     onChange={replaceProduct}
                     onRemove={removeProduct}
+                    drag={productDrag}
+                    canReorder={canReorder}
                   />
                 ))}
               </tbody>
@@ -899,6 +1037,7 @@ function Dashboard({ email }) {
         onChange={replaceCategory}
         onRemove={removeCategory}
         onCreated={addCategory}
+        onReorder={reorderCategoryList}
       />
 
       <AddProductDialog

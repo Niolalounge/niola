@@ -132,6 +132,17 @@ export async function uploadProductImage(file, slug) {
 export async function createProduct({ categoryId, nameAr, nameEn, price, file }) {
   const slug = await findFreeSlug(nameEn || nameAr)
 
+  // Without this the row takes the column default of 0 and ties with every other product added
+  // this way, leaving their order on the site up to whatever Postgres returns that request.
+  const { data: last, error: lastError } = await adminClient
+    .from('menu_products')
+    .select('sort_order')
+    .eq('category_id', categoryId)
+    .order('sort_order', { ascending: false })
+    .limit(1)
+
+  if (lastError) throw lastError
+
   // A product may only be published once it has an image and its dimensions — the database
   // enforces that, so the row is created hidden and published in a second step if a photo came
   // with it.
@@ -143,6 +154,7 @@ export async function createProduct({ categoryId, nameAr, nameEn, price, file })
       name_ar: nameAr,
       name_en: nameEn,
       price,
+      sort_order: (last?.[0]?.sort_order ?? 0) + 10,
       is_published: false,
     })
     .select(PRODUCT_FIELDS)
@@ -240,4 +252,26 @@ export async function deleteCategory(id) {
     throw new Error('لا يمكن حذف تصنيف ما زال يحتوي على منتجات. احذف منتجاته أولاً أو أخفِ التصنيف.')
   }
   throw error
+}
+
+// ---------------------------------------------------------------------------
+// Order
+// ---------------------------------------------------------------------------
+
+/**
+ * Both of these hand the database the ids in their new order and let it renumber sort_order in
+ * one statement — see 0007_ordering.sql for why it is a function rather than a row of updates
+ * from here. The functions run as the caller, so Row Level Security still applies.
+ *
+ * Ids that are left out keep their position, which is what makes it safe to reorder one
+ * category's products without sending the rest of the menu.
+ */
+export async function reorderCategories(ids) {
+  const { error } = await adminClient.rpc('reorder_menu_categories', { ids })
+  if (error) throw error
+}
+
+export async function reorderProducts(ids) {
+  const { error } = await adminClient.rpc('reorder_menu_products', { ids })
+  if (error) throw error
 }

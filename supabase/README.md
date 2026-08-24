@@ -41,13 +41,19 @@ administrators see each other's edits immediately.
 - **Hide an item** — set `is_published = false`. It stays in the table with its price.
 - **Publish an item** — it needs `image_url`, `image_width` and `image_height` first. A constraint
   enforces this, because a card without them shifts the layout while the photo loads.
-- **Reorder** — edit `sort_order`; lower comes first. Leave gaps (10, 20, 30) so a row can move
-  without renumbering its neighbours.
+- **Reorder** — drag it in the dashboard, or edit `sort_order` directly; lower comes first.
+  Rows are numbered 10, 20, 30 …, and a drag renumbers the whole list rather than trying to
+  squeeze a value between two neighbours.
 - **Hide a category** — set `is_published = false`. Its products go with it: the products
   policy checks the category's flag too, so they leave the API rather than staying individually
   fetchable.
 - **Delete a category** — move or delete its products first. The foreign key is `ON DELETE
   RESTRICT`, so the database refuses rather than silently taking 30 products with it.
+
+Before 0007, every product added through the dashboard kept the column default of `sort_order =
+0`; twenty of them ended up tied, and rows that tie come back from Postgres in whatever order it
+likes — which can differ between two requests. Those products had no fixed position on the site at
+all. 0007 gave every row a distinct number and `createProduct` now places each new one at the end.
 
 66 of the 115 products are currently published. The other 49 are hidden because they have no
 photograph yet; add one, fill in its dimensions, and flip `is_published`.
@@ -73,6 +79,7 @@ PostgREST reads and writes rows but has no `CREATE TABLE`.
 | `migrations/0004_admin.sql` | `admin_users`, write policies for administrators, the image bucket |
 | `migrations/0005_realtime.sql` | `content_revision` and the triggers that drive live updates |
 | `migrations/0006_manage_categories.sql` | Lets administrators add, rename, hide and delete categories |
+| `migrations/0007_ordering.sql` | `reorder_*` functions, and one-off numbering for rows that tied |
 
 ## Regenerating the seed after editing `src/data`
 
@@ -124,6 +131,37 @@ is visible. Escape, the backdrop and the close button all dismiss it.
 
 **إدارة التصنيفات**, under the sidebar, opens the sections themselves: add one, rename any of the
 four names in place, hide one, delete an empty one. Names save on blur, the way a price does.
+
+**Editing a product** happens in the row itself: both names and the price save on blur, and the
+visibility switch answers the click immediately. The name fields are deliberately borderless
+until hovered — the table is read far more often than it is edited, and 26 rows of visible form
+controls stop reading as a menu. Renaming never touches the slug, so /menu links keep working.
+
+**Reordering** is a drag from the grip at the start of each row — products in the table,
+categories in that dialog. Some notes on how it works, since none of it is the obvious choice:
+
+- It is Pointer Events, not the HTML5 drag-and-drop API, which never fires on touch at all.
+- The drag starts on the grip and nowhere else, so a finger anywhere else on a row still scrolls.
+  `touch-action: none` on the grip is load-bearing: without it the browser claims the gesture and
+  no `pointermove` is ever delivered.
+- Nothing reorders until you let go. The row follows the finger, a line shows where it will land,
+  and the list is spliced once — reordering live would move the ground under the measurement that
+  decides where to reorder to.
+- The grip is a button, so **arrow keys move a row** without a pointer.
+- Dragging is off while a search or a filter is on, and the panel says so. What you can see then
+  is a subset, and dropping row 3 of 5 visible rows says nothing about where it belongs among the
+  32 that are not.
+- The write is `reorder_menu_categories(ids)` / `reorder_menu_products(ids)` — the ids in their
+  new order, renumbered in a single statement. Atomic, touches no column but `sort_order` (so it
+  cannot clobber a price someone else is editing), and because the `content_revision` trigger is
+  `FOR EACH STATEMENT`, reordering 32 products sends open browsers one event rather than 32.
+  Both are `SECURITY INVOKER`, so RLS still decides: a non-administrator's call succeeds and
+  changes nothing.
+- Ids left out of the array keep their position, which is what makes it safe to send one
+  category's products rather than the whole menu.
+
+The homepage tile order is a separate list — `homepage_sort_order`, nine of the categories — and
+is not editable from the dashboard yet.
 
 A few things follow from the schema rather than from the page:
 
