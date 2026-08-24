@@ -11,7 +11,10 @@
   --nav-height: 92px;
   --shell: min(1680px, calc(100vw - 96px));
   --body-font: 'Noto Kufi Arabic', Tahoma, 'Segoe UI', sans-serif;
-  --display-font: 'Noto Serif Arabic', Georgia, serif;
+  /* The site runs on one typeface, the one the header uses. --display-font stays a separate
+     token so headings can be given a face of their own again by editing this line alone; it
+     just resolves to the same stack today. */
+  --display-font: var(--body-font);
   color: var(--deep-espresso);
   background: var(--deep-espresso);
   font-family: var(--body-font);
@@ -22,8 +25,8 @@
 }
 
 [lang='en'] {
+  /* --display-font follows this, so it does not need restating. */
   --body-font: 'Noto Kufi Arabic', 'Segoe UI', sans-serif;
-  --display-font: 'Cormorant Garamond', Georgia, serif;
 }
 
 * { box-sizing: border-box; }
@@ -963,7 +966,7 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
 .footer__contact { display: flex; flex-direction: column; align-items: flex-start; }
 .footer__contact > a {
   color: var(--champagne-gold);
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--display-font);
   font-size: 1.45rem;
   letter-spacing: 0.04em;
 }
