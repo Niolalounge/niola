@@ -1,4 +1,6 @@
-# The dashboard is a private tool, not a page of the site.
+# /admin is deliberately crawlable so that the noindex it returns can actually be read.
+# Disallowing it would stop crawlers fetching the page — and therefore stop them ever seeing
+# "X-Robots-Tag: noindex", which is what keeps it out of results. A blocked URL can still be
+# indexed from an external link; a fetched-and-noindexed one cannot.
 User-agent: *
 Allow: /
-Disallow: /admin

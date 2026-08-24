@@ -7,7 +7,17 @@ import { useLanguage } from '../hooks/useLanguage'
 
 function readCategoryFromHash(categories) {
   if (typeof window === 'undefined') return null
-  const slug = decodeURIComponent(window.location.hash.slice(1))
+
+  const raw = window.location.hash.slice(1)
+  let slug
+  try {
+    slug = decodeURIComponent(raw)
+  } catch {
+    // A fragment mangled in transit — "#50%" — makes decodeURIComponent throw. This runs during
+    // render, so an unguarded throw takes the whole page down rather than just missing a tab.
+    slug = raw
+  }
+
   return categories.some((category) => category.slug === slug) ? slug : null
 }
 
@@ -15,7 +25,12 @@ export default function Menu() {
   const { copy, language } = useLanguage()
   const { categories } = useContent()
   const { key: locationKey } = useLocation()
-  const [activeCategory, setActiveCategory] = useState(() => readCategoryFromHash(categories))
+  // Falls back to the first category on the very first render too: the section below already
+  // renders categories[0] when nothing is selected, so leaving this null highlighted no tab
+  // until the effect ran.
+  const [activeCategory, setActiveCategory] = useState(
+    () => readCategoryFromHash(categories) ?? categories[0]?.slug ?? null,
+  )
   const categoryTrackRef = useRef(null)
 
   const defaultCategory = categories[0]?.slug
@@ -66,7 +81,9 @@ export default function Menu() {
     event.preventDefault()
     setActiveCategory(slug)
     if (window.location.hash.slice(1) !== slug) {
-      window.history.replaceState(null, '', `#${slug}`)
+      // Preserve the existing entry state: react-router keeps its own bookkeeping there
+      // ({ usr, key, idx }), and replacing it with null breaks back/forward navigation.
+      window.history.replaceState(window.history.state, '', `#${slug}`)
     }
     alignToMenuTop()
   }

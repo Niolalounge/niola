@@ -82,7 +82,11 @@ export default function ScrollManager() {
     }
 
     const reachDestination = () => {
-      const hashId = decodeURIComponent(location.hash.slice(1))
+      const rawHash = location.hash.slice(1)
+      // A malformed fragment such as "#50%" makes decodeURIComponent throw; falling back to the
+      // raw text keeps scroll restoration working instead of killing it.
+      let hashId
+      try { hashId = decodeURIComponent(rawHash) } catch { hashId = rawHash }
 
       // `#home` means the absolute top of the page, never a measured section offset — and
       // the menu page handles its own category hashes, so it always opens at the top too.

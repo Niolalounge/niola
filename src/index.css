@@ -1720,3 +1720,25 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
   from { opacity: 0; transform: scale(0.985) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* Shown only when a route fails to render — in practice a chunk from a superseded deploy that
+   could not be fetched. RouteErrorBoundary reloads once on its own; this is the second attempt. */
+.route-error {
+  display: grid;
+  gap: 1rem;
+  place-items: center;
+  padding: 6rem 1.5rem;
+  text-align: center;
+  color: var(--warm-ivory);
+}
+.route-error p { margin: 0; font-size: 0.95rem; }
+.route-error button {
+  padding: 0.6rem 1.2rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--champagne-gold);
+  color: var(--deep-espresso);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

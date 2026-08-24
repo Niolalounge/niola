@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import LanguageProvider from './components/LanguageProvider'
 import ContentProvider from './components/ContentProvider'
 import ScrollManager from './components/ScrollManager'
+import RouteErrorBoundary from './components/RouteErrorBoundary'
 import { useLanguage } from './hooks/useLanguage'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -25,14 +26,16 @@ function PublicSite() {
       <ScrollManager />
       <Navbar />
       <main id="main-content">
-        <Suspense fallback={routeLoader}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+        <RouteErrorBoundary>
+          <Suspense fallback={routeLoader}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
       </main>
       <Footer />
     </>
@@ -49,7 +52,11 @@ export default function App() {
                 smooth-scrolling, which would fight with a long editable table. */}
             <Route
               path="/admin"
-              element={<Suspense fallback={routeLoader}><Admin /></Suspense>}
+              element={(
+                <RouteErrorBoundary>
+                  <Suspense fallback={routeLoader}><Admin /></Suspense>
+                </RouteErrorBoundary>
+              )}
             />
             <Route path="*" element={<PublicSite />} />
           </Routes>
