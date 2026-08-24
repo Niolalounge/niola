@@ -145,7 +145,7 @@ export default function Menu() {
                   </div>
                   <div className="menu-product-card__body">
                     <h3>{item.name[language]}</h3>
-                    <span dir="ltr">{formatPrice(item.price)}</span>
+                    <span>{formatPrice(item.price)}</span>
                   </div>
                 </li>
               ))}

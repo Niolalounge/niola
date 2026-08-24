@@ -21,7 +21,7 @@ const text = {
   loading: 'جارٍ التحميل…',
   retry: 'إعادة المحاولة',
   price: 'السعر',
-  currency: 'ج.م',
+  currency: 'جنيه',
   product: 'المنتج',
   photo: 'الصورة',
   status: 'الحالة',

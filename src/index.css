@@ -1246,7 +1246,7 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  font-size: 0.66rem;
+  font-size: 0.74rem;
   white-space: nowrap;
   transition: color 380ms ease, border-color 380ms ease, background-color 380ms ease, box-shadow 380ms ease, text-shadow 380ms ease;
 }
@@ -1279,7 +1279,7 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
   --product-media-ratio: 1 / 1;
   background: var(--warm-ivory);
   border-block-end: 1px solid rgba(42, 29, 23, 0.1);
-  scroll-margin-top: 150px;
+  scroll-margin-top: 156px;
   animation: menu-category-in 190ms ease both;
 }
 .menu-section.section-pad { padding-block: clamp(26px, 2.6vw, 40px) clamp(76px, 7vw, 116px); }
@@ -1358,7 +1358,7 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
 .menu-product-card__body {
   min-height: 92px;
   padding: 18px 19px 20px;
-  text-align: start;
+  text-align: center;
 }
 .menu-product-card h3 {
   color: var(--dark-walnut);
@@ -1370,13 +1370,13 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
 }
 .menu-product-card__body > span {
   display: block;
-  margin-block-start: 5px;
+  margin-block-start: 7px;
   color: #a06f43;
-  font-size: 0.67rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-family: var(--display-font);
+  font-size: clamp(0.95rem, 1.1vw, 1.16rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
-[dir='rtl'] .menu-product-card__body > span { text-align: right; }
 .menu-product-card:hover {
   border-color: rgba(216, 179, 106, 0.58);
   box-shadow: 0 15px 34px rgba(54, 36, 27, 0.11), 0 0 18px rgba(216, 179, 106, 0.12);
@@ -1651,8 +1651,8 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
   .gallery-lightbox__previous { inset-inline-start: calc(50% - 58px); }
   .gallery-lightbox__next { inset-inline-end: calc(50% - 58px); }
   .menu-category-nav__track { gap: 8px; padding-block: 7px; }
-  .menu-category-nav a { padding: 9px 12px 11px; }
-  .menu-section { scroll-margin-top: 135px; }
+  .menu-category-nav a { padding: 10px 14px 12px; font-size: 0.88rem; }
+  .menu-section { scroll-margin-top: 145px; }
   .menu-section.section-pad { padding-block: 28px 68px; }
   .menu-section__header { display: block; margin-block-end: 30px; padding-block-end: 24px; }
   .menu-section__header h2 { font-size: clamp(2.8rem, 14vw, 4.2rem); }
@@ -1661,6 +1661,7 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
   .menu-product-card { border-radius: 14px; }
   .menu-product-card__body { min-height: 82px; padding: 14px 13px 16px; }
   .menu-product-card h3 { font-size: 1.02rem; }
+  .menu-product-card__body > span { font-size: 0.9rem; }
   .menu-return { padding-block: 80px; }
   .menu-return .shell { align-items: flex-start; flex-direction: column; }
 }

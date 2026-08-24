@@ -123,7 +123,7 @@ export const translations = {
       currentCategory: 'القسم الحالي',
       productNameLabel: 'الصنف',
       priceLabel: 'السعر',
-      currency: 'ج.م',
+      currency: 'جنيه',
       categories: {
         coffee: 'القهوة',
         specialtyCoffee: 'القهوة المختصة',
