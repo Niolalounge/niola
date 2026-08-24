@@ -119,18 +119,27 @@ to whichever category is on screen; after saving, the list jumps to that categor
 is visible. Escape, the backdrop and the close button all dismiss it.
 
 Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
-effect on their next request rather than whenever their session expires:
+effect on their next request rather than whenever their session expires.
+
+Granting access is two steps — the login, then the membership row — and `create-admin.mjs` does
+both. Re-running it resets the password of an account that already exists, so it doubles as the
+way to change one:
+
+```bash
+SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=<secret>   node scripts/create-admin.mjs someone@example.com 'their-password'
+```
+
+By hand instead: create the account under **Authentication → Users → Add user**, then
 
 ```sql
 -- grant, for a user that already exists in Authentication → Users
 insert into public.admin_users (user_id, email)
 select id, email from auth.users where email = 'someone@example.com';
 
--- revoke
+-- revoke — the login survives, it just stops matching any policy
 delete from public.admin_users where email = 'someone@example.com';
 ```
 
-Create the account itself under **Authentication → Users → Add user** in the Supabase dashboard.
 Self-signup is not wired up, so there is no way to grant yourself access from the browser.
 
 What the dashboard enforces, and why the database enforces it too:

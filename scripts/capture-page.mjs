@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -11,7 +11,18 @@ if (!url || !width || !height || !outputValue) {
   throw new Error('Usage: node scripts/capture-page.mjs <url> <width> <height> <output>')
 }
 
-const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+// Chrome ends up in a different place depending on how it was installed, so try each one
+// rather than failing with a spawn ENOENT that says nothing about what to do about it.
+const chromePath = [
+  process.env.CHROME_PATH,
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  process.env.LOCALAPPDATA && `${process.env.LOCALAPPDATA}/Google/Chrome/Application/chrome.exe`,
+].find((candidate) => candidate && existsSync(candidate))
+
+if (!chromePath) {
+  throw new Error('Chrome was not found in the usual places. Set CHROME_PATH to its .exe.')
+}
 const port = 9300 + Math.floor(Math.random() * 500)
 const profile = mkdtempSync(join(tmpdir(), 'niola-capture-'))
 const chrome = spawn(chromePath, [
