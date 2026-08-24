@@ -43,6 +43,9 @@ administrators see each other's edits immediately.
   enforces this, because a card without them shifts the layout while the photo loads.
 - **Reorder** — edit `sort_order`; lower comes first. Leave gaps (10, 20, 30) so a row can move
   without renumbering its neighbours.
+- **Hide a category** — set `is_published = false`. Its products go with it: the products
+  policy checks the category's flag too, so they leave the API rather than staying individually
+  fetchable.
 - **Delete a category** — move or delete its products first. The foreign key is `ON DELETE
   RESTRICT`, so the database refuses rather than silently taking 30 products with it.
 
@@ -69,6 +72,7 @@ PostgREST reads and writes rows but has no `CREATE TABLE`.
 | `migrations/0003_harden.sql` | Narrows anon to `SELECT`; one gallery photo per grid slot |
 | `migrations/0004_admin.sql` | `admin_users`, write policies for administrators, the image bucket |
 | `migrations/0005_realtime.sql` | `content_revision` and the triggers that drive live updates |
+| `migrations/0006_manage_categories.sql` | Lets administrators add, rename, hide and delete categories |
 
 ## Regenerating the seed after editing `src/data`
 
@@ -117,6 +121,20 @@ first version unreadable. Above it, four counters (total, visible, hidden, witho
 the list and works while a search is open. The dialog carries its own category picker, defaulting
 to whichever category is on screen; after saving, the list jumps to that category so the new row
 is visible. Escape, the backdrop and the close button all dismiss it.
+
+**إدارة التصنيفات**, under the sidebar, opens the sections themselves: add one, rename any of the
+four names in place, hide one, delete an empty one. Names save on blur, the way a price does.
+
+A few things follow from the schema rather than from the page:
+
+- **Renaming is always safe.** The slug is the public identifier — `/menu#tea` and every link
+  anyone has saved point at it — and renaming never touches it.
+- **A new category is invisible until it has a published product**, because `fetchMenu` drops
+  empty categories rather than rendering a section with a "00" count.
+- **A new category's product images render 1:1** until `src/index.css` gets a
+  `.menu-section[data-category='<slug>']` ratio for it. See *Known coupling to CSS* below.
+- **Delete is only offered on an empty category**, matching `ON DELETE RESTRICT`. Hiding is the
+  answer for everything else, and it keeps every product and every price.
 
 Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
 effect on their next request rather than whenever their session expires.

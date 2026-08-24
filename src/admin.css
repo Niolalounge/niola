@@ -308,6 +308,81 @@
 }
 .admin-dialog__actions { display: flex; align-items: center; gap: 1rem; }
 
+/* ---- categories ---- */
+
+.admin-sidebar button.admin-sidebar__manage {
+  width: 100%;
+  margin-top: 0.55rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px dashed var(--admin-line-strong); border-radius: 8px;
+  background: none; color: var(--latte-sand);
+  font: inherit; font-size: 0.76rem; cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.admin-sidebar button.admin-sidebar__manage:hover {
+  color: var(--champagne-gold);
+  border-color: var(--champagne-gold);
+  background: rgba(216, 179, 106, 0.08);
+}
+
+.admin-sidebar__count.is-hidden-flag { color: #e0b062; }
+.admin-sidebar button.is-active .admin-sidebar__count.is-hidden-flag { color: #e0b062; }
+
+.admin-dialog--wide { width: min(46rem, calc(100vw - 2rem)); }
+
+/* One line: two names and the button that adds them. Anything longer than the names belongs in
+   the row below, where the category already exists and can be edited in place. */
+.admin-category-new {
+  display: grid; gap: 0.6rem; align-items: end;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  padding: 0.8rem;
+  border: 1px solid var(--admin-line-strong); border-radius: 11px;
+  background: rgba(216, 179, 106, 0.05);
+}
+.admin-category-new label { display: grid; gap: 0.3rem; min-width: 0; }
+.admin-category-new label > span { font-size: 0.72rem; color: var(--latte-sand); }
+.admin-category-new button[type='submit'] { white-space: nowrap; }
+
+.admin-category-list {
+  list-style: none; margin: 0; padding: 0.15rem;
+  display: grid; gap: 0.6rem;
+  /* The dialog must not outgrow the viewport with ten sections in it, and a scroll that stops at
+     the list keeps the add form and the Done button in place while you work down the page. */
+  max-height: 48vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+}
+
+.admin-category {
+  display: grid; gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--admin-line); border-radius: 11px;
+  background: var(--admin-surface);
+}
+.admin-category.is-hidden { border-style: dashed; background: rgba(30, 23, 18, 0.55); }
+.admin-category.is-hidden .admin-category__fields { opacity: 0.6; }
+
+.admin-category__fields { display: grid; gap: 0.55rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-category__fields label { display: grid; gap: 0.25rem; min-width: 0; }
+.admin-category__fields label > span { font-size: 0.68rem; color: var(--latte-sand); }
+
+/* .admin-dialog label makes every label inside a dialog a stacked field — right for a caption
+   over an input, wrong for the switch, where it drops the word underneath the track. */
+.admin-dialog label.admin-switch { display: inline-flex; }
+
+.admin-category__foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem;
+  padding-top: 0.5rem; border-top: 1px solid rgba(216, 179, 106, 0.09);
+}
+.admin-category__count { font-size: 0.72rem; color: var(--latte-sand); font-variant-numeric: tabular-nums; }
+/* Takes the leftover width so the delete button stays pinned to the end however long a message
+   turns out to be. */
+.admin-category__state { flex: 1 1 auto; min-width: 0; }
+.admin-category__foot .admin-icon-button { flex: none; }
+.admin-category__foot .admin-icon-button:disabled {
+  opacity: 0.3; cursor: not-allowed;
+  color: var(--latte-sand); border-color: transparent; background: none;
+}
+
 /* ---- narrow screens ---- */
 
 @media (max-width: 900px) {
@@ -419,4 +494,26 @@
     background: var(--admin-surface-raised); border: 1px solid var(--admin-line-strong);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   }
+  /* The categories dialog stacks the same way the product form does: two names side by side is
+     two half-width fields on a phone, which is no field at all. */
+  .admin-category-new { grid-template-columns: minmax(0, 1fr); }
+  .admin-category-new button[type='submit'] { padding-block: 0.8rem; }
+  .admin-category__fields { grid-template-columns: minmax(0, 1fr); }
+  /* On a desktop the list scrolls inside the dialog so the add form and Done stay put. A phone
+     has no room for that: head, form, note, list and actions together are taller than the
+     screen, and a scrolling box inside a clipped dialog hides the end of the list. One scroll
+     for the whole dialog instead. */
+  .admin-dialog--wide .admin-dialog__body { max-height: 84vh; overflow-y: auto; }
+  .admin-category-list { max-height: none; overflow: visible; }
+  .admin-category__foot { gap: 0.5rem 0.7rem; }
+  .admin-category__foot .admin-icon-button:not(:disabled) {
+    width: 2.5rem; height: 2.5rem; border-color: var(--admin-line);
+  }
+  /* Everything on one line, delete included. Only the save message is allowed to give ground,
+     because a full-width message pushes the delete button onto a line of its own — the whole
+     width of the card away from the row it belongs to. */
+  .admin-category__foot :is(.admin-switch, .admin-category__count) { flex: none; }
+  .admin-category__foot .admin-switch__label { white-space: nowrap; }
+  .admin-category__state { flex: 1 1 4rem; }
+
 }

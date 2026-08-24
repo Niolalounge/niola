@@ -2,11 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '../admin.css'
 import { adminClient } from '../lib/adminClient'
 import {
+  createCategory,
   createProduct,
+  deleteCategory,
   deleteProduct,
   loadMenu,
   setProductImage,
   subscribeToMenuChanges,
+  updateCategory,
   updateProduct,
 } from '../lib/adminApi'
 
@@ -48,6 +51,26 @@ const text = {
   noResults: 'لا توجد نتائج مطابقة.',
   emptyCategory: 'لا توجد منتجات في هذا التصنيف بعد.',
   categories: 'التصنيفات',
+  manageCategories: 'إدارة التصنيفات',
+  addCategory: 'إضافة تصنيف',
+  subtitleAr: 'الوصف بالعربية',
+  subtitleEn: 'الوصف بالإنجليزية',
+  optional: 'اختياري',
+  categoryNote:
+    'التصنيف الجديد يظهر على الموقع بمجرد أن يضم منتجاً واحداً ظاهراً. الإخفاء يرفع التصنيف بكل '
+    + 'منتجاته عن الموقع دون حذف شيء، والحذف لا يتاح إلا بعد إفراغ التصنيف.',
+  categoryHasProducts: 'أفرغ التصنيف من منتجاته قبل حذفه، أو أخفِه بدلاً من ذلك.',
+  removeCategory: 'حذف التصنيف',
+  confirmRemoveCategory: (name) => `حذف تصنيف «${name}» نهائياً؟`,
+  close: 'إغلاق',
+  done: 'تم',
+  productCount: (count) => {
+    if (count === 0) return 'لا منتجات'
+    if (count === 1) return 'منتج واحد'
+    if (count === 2) return 'منتجان'
+    if (count <= 10) return `${count} منتجات`
+    return `${count} منتجاً`
+  },
   filters: {
     all: 'الكل',
     visible: 'الظاهر',
@@ -84,6 +107,35 @@ const FILTERS = {
   visible: (product) => product.is_published,
   hidden: (product) => !product.is_published,
   nophoto: (product) => !product.image_url,
+}
+
+/**
+ * The save lifecycle every editable row shares: run the write, show "saving" and then a tick,
+ * and surface the message if it fails.
+ *
+ * `run` returns whether the write landed, so an optimistic control can put itself back if it
+ * did not.
+ */
+function useRowSave(onChange) {
+  const [state, setState] = useState('idle')
+  const [error, setError] = useState(null)
+
+  const run = useCallback(async (work) => {
+    setState('saving')
+    setError(null)
+    try {
+      onChange(await work())
+      setState('saved')
+      setTimeout(() => setState('idle'), 1600)
+      return true
+    } catch (cause) {
+      setError(cause.message)
+      setState('idle')
+      return false
+    }
+  }, [onChange])
+
+  return { state, error, run }
 }
 
 function useSignedInAdmin() {
@@ -146,28 +198,11 @@ function ProductRow({ product, categoryName, onChange, onRemove }) {
   // The checkbox answers the click immediately and only falls back to the stored value if the
   // write fails; without this it snaps back for the length of the round trip and reads as broken.
   const [published, setPublished] = useState(product.is_published)
-  const [state, setState] = useState('idle')
-  const [error, setError] = useState(null)
+  const { state, error, run } = useRowSave(onChange)
   const fileRef = useRef(null)
 
   useEffect(() => { setPrice(String(product.price)) }, [product.price])
   useEffect(() => { setPublished(product.is_published) }, [product.is_published])
-
-  /** Returns whether the write landed, so an optimistic control can put itself back if it did not. */
-  const run = async (work) => {
-    setState('saving')
-    setError(null)
-    try {
-      onChange(await work())
-      setState('saved')
-      setTimeout(() => setState('idle'), 1600)
-      return true
-    } catch (cause) {
-      setError(cause.message)
-      setState('idle')
-      return false
-    }
-  }
 
   const commitPrice = () => {
     const next = Number(price)
@@ -346,7 +381,9 @@ function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCrea
             <span>{text.category}</span>
             <select value={categoryId ?? ''} onChange={(e) => setCategoryId(e.target.value)} required>
               {categories.map((category) => (
-                <option key={category.id} value={category.id}>{category.name_ar}</option>
+                <option key={category.id} value={category.id}>
+                  {category.is_published ? category.name_ar : `${category.name_ar} — ${text.hidden}`}
+                </option>
               ))}
             </select>
           </label>
@@ -384,6 +421,201 @@ function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCrea
   )
 }
 
+/**
+ * One category, editable in place.
+ *
+ * The four names save on blur, the way a price does — a category is renamed once in a blue moon,
+ * and an explicit save button for four fields across ten rows is forty controls nobody needs.
+ *
+ * Deleting is only offered on an empty category. The database refuses it otherwise
+ * (menu_products.category_id is ON DELETE RESTRICT), and that is the right answer: a section
+ * should not be something thirty products can be lost to by one mis-click. Hiding is the move
+ * for "take this off the site", and it leaves every product exactly where it is.
+ */
+function CategoryRow({ category, onChange, onRemove }) {
+  const [draft, setDraft] = useState(category)
+  const [published, setPublished] = useState(category.is_published)
+  const { state, error, run } = useRowSave(onChange)
+  const editingRef = useRef(null)
+
+  /**
+   * Stored values win, so another administrator's rename shows up here — except in the field
+   * being typed into at this moment. Saving the Arabic name returns a fresh row a moment after
+   * the cursor has moved on to the English one, and without this it would land on top of the
+   * half-typed word there.
+   */
+  useEffect(() => {
+    setDraft((current) => {
+      const editing = editingRef.current
+      return editing ? { ...category, [editing]: current[editing] } : category
+    })
+  }, [category])
+  useEffect(() => { setPublished(category.is_published) }, [category.is_published])
+
+  const productCount = category.products.length
+
+  /** Names are required by the database; a blank one puts the stored value back rather than failing. */
+  const commit = (name, required) => {
+    const next = draft[name]?.trim() ?? ''
+    const stored = category[name] ?? ''
+    if (next === stored) return
+    if (required && !next) {
+      setDraft((current) => ({ ...current, [name]: category[name] }))
+      return
+    }
+    run(() => updateCategory(category.id, { [name]: next === '' ? null : next }))
+  }
+
+  const field = (name, label, { required = false, ltr = false } = {}) => (
+    <label>
+      <span>{required ? label : `${label} · ${text.optional}`}</span>
+      <input
+        value={draft[name] ?? ''}
+        dir={ltr ? 'ltr' : undefined}
+        onChange={(event) => setDraft((current) => ({ ...current, [name]: event.target.value }))}
+        onFocus={() => { editingRef.current = name }}
+        onBlur={() => { editingRef.current = null; commit(name, required) }}
+        onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
+        aria-label={`${label} — ${category.name_ar}`}
+      />
+    </label>
+  )
+
+  return (
+    <li className={published ? 'admin-category' : 'admin-category is-hidden'}>
+      <div className="admin-category__fields">
+        {field('name_ar', text.nameAr, { required: true })}
+        {field('name_en', text.nameEn, { required: true, ltr: true })}
+        {field('subtitle_ar', text.subtitleAr)}
+        {field('subtitle_en', text.subtitleEn, { ltr: true })}
+      </div>
+
+      <div className="admin-category__foot">
+        <label className={`admin-switch${published ? ' is-on' : ''}`}>
+          <input
+            type="checkbox"
+            checked={published}
+            onChange={async (event) => {
+              const next = event.target.checked
+              setPublished(next)
+              const saved = await run(() => updateCategory(category.id, { is_published: next }))
+              if (!saved) setPublished(category.is_published)
+            }}
+          />
+          <span className="admin-switch__track" aria-hidden="true"><span /></span>
+          <span className="admin-switch__label">{published ? text.visible : text.hidden}</span>
+        </label>
+
+        <span className="admin-category__count">{text.productCount(productCount)}</span>
+
+        <span className="admin-category__state">
+          {state === 'saving' && <span className="admin-state">{text.saving}</span>}
+          {state === 'saved' && <span className="admin-state is-ok">✓ {text.saved}</span>}
+          {error && <span className="admin-error" role="alert">{error}</span>}
+        </span>
+
+        <button
+          type="button"
+          className="admin-icon-button"
+          disabled={productCount > 0}
+          title={productCount > 0 ? text.categoryHasProducts : text.removeCategory}
+          aria-label={`${text.removeCategory} — ${category.name_ar}`}
+          onClick={() => {
+            if (window.confirm(text.confirmRemoveCategory(category.name_ar))) {
+              run(async () => { await deleteCategory(category.id); onRemove(category.id); return null })
+            }
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    </li>
+  )
+}
+
+/**
+ * Every section the menu is divided into, on one screen: add, rename, hide, delete.
+ *
+ * A dialog rather than a third column, for the same reason adding a product is one — this is
+ * something the owner does a few times a year, and it should not cost the product list any of
+ * the width it uses every day.
+ */
+function ManageCategoriesDialog({ open, categories, onClose, onChange, onRemove, onCreated }) {
+  const dialogRef = useRef(null)
+  const [nameAr, setNameAr] = useState('')
+  const [nameEn, setNameEn] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    if (open && !dialog.open) {
+      setNameAr(''); setNameEn(''); setError(null)
+      dialog.showModal()
+    } else if (!open && dialog.open) {
+      dialog.close()
+    }
+  }, [open])
+
+  const submit = async (event) => {
+    event.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      onCreated(await createCategory({ nameAr: nameAr.trim(), nameEn: nameEn.trim() }))
+      // Cleared rather than closed: adding a few sections in one sitting is the usual reason to be here.
+      setNameAr('')
+      setNameEn('')
+    } catch (cause) {
+      setError(cause.message)
+    }
+    setBusy(false)
+  }
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="admin-dialog admin-dialog--wide"
+      onClose={onClose}
+      onClick={(event) => { if (event.target === dialogRef.current) onClose() }}
+      aria-labelledby="admin-categories-title"
+    >
+      <div className="admin-dialog__body">
+        <header className="admin-dialog__head">
+          <h2 id="admin-categories-title">{text.manageCategories}</h2>
+          <button type="button" className="admin-icon-button" onClick={onClose} aria-label={text.close}>✕</button>
+        </header>
+
+        <form className="admin-category-new" onSubmit={submit}>
+          <label>
+            <span>{text.nameAr}</span>
+            <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required placeholder="المخبوزات" />
+          </label>
+          <label>
+            <span>{text.nameEn}</span>
+            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" placeholder="Bakery" />
+          </label>
+          <button type="submit" disabled={busy}>{busy ? text.saving : text.addCategory}</button>
+        </form>
+        {error && <p className="admin-error" role="alert">{error}</p>}
+
+        <p className="admin-dialog__note">{text.categoryNote}</p>
+
+        <ul className="admin-category-list">
+          {categories.map((category) => (
+            <CategoryRow key={category.id} category={category} onChange={onChange} onRemove={onRemove} />
+          ))}
+        </ul>
+
+        <div className="admin-dialog__actions">
+          <button type="button" className="admin-link" onClick={onClose}>{text.done}</button>
+        </div>
+      </div>
+    </dialog>
+  )
+}
+
 function Stat({ value, label, tone }) {
   return (
     <div className={`admin-stat${tone ? ` is-${tone}` : ''}`}>
@@ -400,6 +632,7 @@ function Dashboard({ email }) {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [adding, setAdding] = useState(false)
+  const [managing, setManaging] = useState(false)
 
   const load = useCallback(() => {
     setError(null)
@@ -457,6 +690,24 @@ function Dashboard({ email }) {
     setFilter('all')
   }, [])
 
+  const replaceCategory = useCallback((updated) => {
+    if (!updated) return
+    setCategories((current) => current.map((category) => (
+      category.id === updated.id ? { ...category, ...updated } : category
+    )))
+  }, [])
+
+  const removeCategory = useCallback((categoryId) => {
+    setCategories((current) => current.filter((category) => category.id !== categoryId))
+  }, [])
+
+  const addCategory = useCallback((created) => {
+    setCategories((current) => [...current, created])
+    // Open it, so closing the dialog lands on the empty section that now wants products.
+    setActiveId(created.id)
+    setQuery('')
+  }, [])
+
   const stats = useMemo(() => {
     if (!categories) return null
     const all = categories.flatMap((category) => category.products)
@@ -469,6 +720,15 @@ function Dashboard({ email }) {
   }, [categories])
 
   const searching = query.trim().length > 0
+
+  /**
+   * Falls back to the first category rather than to nothing: the open one can disappear under
+   * you — deleted in the categories dialog, or by another administrator while this tab watches.
+   */
+  const active = useMemo(
+    () => categories?.find((category) => category.id === activeId) ?? categories?.[0] ?? null,
+    [categories, activeId],
+  )
 
   /**
    * Only one category is on screen at a time — 115 rows at once is what made this unreadable.
@@ -487,11 +747,10 @@ function Dashboard({ email }) {
         .map((product) => ({ product, categoryName: category.name_ar })))
     }
 
-    const active = categories.find((category) => category.id === activeId)
     return (active?.products ?? [])
       .filter((product) => matchesFilter(product))
       .map((product) => ({ product, categoryName: null }))
-  }, [categories, activeId, query, filter, searching])
+  }, [categories, active, query, filter, searching])
 
   if (error) {
     return (
@@ -503,7 +762,6 @@ function Dashboard({ email }) {
   }
   if (!categories) return <p className="admin-state admin-state--page">{text.loading}</p>
 
-  const active = categories.find((category) => category.id === activeId)
   const totalInScope = searching
     ? categories.flatMap((c) => c.products).length
     : (active?.products.length ?? 0)
@@ -536,21 +794,30 @@ function Dashboard({ email }) {
           <ul>
             {categories.map((category) => {
               const shown = category.products.filter((p) => p.is_published).length
+              const isActive = !searching && category.id === active?.id
               return (
                 <li key={category.id}>
                   <button
                     type="button"
-                    className={!searching && category.id === activeId ? 'is-active' : undefined}
-                    aria-current={!searching && category.id === activeId ? 'true' : undefined}
+                    className={isActive ? 'is-active' : undefined}
+                    aria-current={isActive ? 'true' : undefined}
                     onClick={() => { setActiveId(category.id); setQuery('') }}
                   >
                     <span>{category.name_ar}</span>
-                    <span className="admin-sidebar__count">{shown}/{category.products.length}</span>
+                    {/* A hidden category is off the site entirely, which matters more here than
+                        how many of its products are published. */}
+                    {category.is_published
+                      ? <span className="admin-sidebar__count">{shown}/{category.products.length}</span>
+                      : <span className="admin-sidebar__count is-hidden-flag">{text.hidden}</span>}
                   </button>
                 </li>
               )
             })}
           </ul>
+
+          <button type="button" className="admin-sidebar__manage" onClick={() => setManaging(true)}>
+            <span aria-hidden="true">⚙</span> {text.manageCategories}
+          </button>
         </nav>
 
         <section className="admin-panel">
@@ -624,6 +891,15 @@ function Dashboard({ email }) {
 
         </section>
       </div>
+
+      <ManageCategoriesDialog
+        open={managing}
+        categories={categories}
+        onClose={() => setManaging(false)}
+        onChange={replaceCategory}
+        onRemove={removeCategory}
+        onCreated={addCategory}
+      />
 
       <AddProductDialog
         open={adding}
