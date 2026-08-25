@@ -39,6 +39,7 @@ const text = {
   willStayHidden: 'بدون صورة سيُضاف مخفياً — يمكنك إظهاره بعد رفع صورته.',
   nameAr: 'الاسم بالعربية',
   nameEn: 'الاسم بالإنجليزية',
+  nameEnPlaceholder: 'بالإنجليزية (اختياري)',
   save: 'حفظ',
   saving: 'جارٍ الحفظ…',
   saved: 'تم الحفظ',
@@ -66,6 +67,7 @@ const text = {
     'التصنيف الجديد يظهر على الموقع بمجرد أن يضم منتجاً واحداً ظاهراً. الإخفاء يرفع التصنيف بكل '
     + 'منتجاته عن الموقع دون حذف شيء، والحذف لا يتاح إلا بعد إفراغ التصنيف.',
   categoryHasProducts: 'أفرغ التصنيف من منتجاته قبل حذفه، أو أخفِه بدلاً من ذلك.',
+  categoryHasHomeTile: 'هذا التصنيف يحمل بطاقة في الصفحة الرئيسية، وحذفه يحذفها معه.',
   removeCategory: 'حذف التصنيف',
   confirmRemoveCategory: (name) => `حذف تصنيف «${name}» نهائياً؟`,
   close: 'إغلاق',
@@ -97,7 +99,9 @@ const text = {
  * hand. Folding them means typing "شاي كرك" finds "شاى كرك" and "إسبريسو" finds "اسبريسو".
  */
 function fold(value) {
-  return String(value)
+  // ?? rather than String(value): a missing English name would otherwise fold to "null" and
+  // match a search for it.
+  return String(value ?? '')
     .toLowerCase()
     .replace(/[ً-ْٰـ]/g, '')
     .replace(/[أإآٱ]/g, 'ا')
@@ -175,8 +179,8 @@ function DragHandle({ label, ...props }) {
  * Two things it has to get right. Stored values win, so another administrator's rename appears
  * here — except in the field being typed into at this moment: saving the Arabic name returns a
  * fresh row a moment after the cursor has moved on to the English one, and without that guard it
- * lands on top of the half-typed word there. And a name the database requires cannot be cleared,
- * so a blank one puts the stored value back instead of failing the write.
+ * lands on top of the half-typed word there. And the Arabic name, which the database requires,
+ * cannot be cleared: a blank one puts the stored value back instead of failing the write.
  */
 function useDraftFields({ record, run, save }) {
   const [draft, setDraft] = useState(record)
@@ -342,7 +346,8 @@ function ProductRow({ product, categoryName, onChange, onRemove, drag, canReorde
         <input
           className="admin-name-field admin-name-field--en"
           aria-label={`${text.nameEn} — ${product.name_ar}`}
-          {...fieldProps('name_en', { required: true, ltr: true })}
+          placeholder={text.nameEnPlaceholder}
+          {...fieldProps('name_en', { ltr: true })}
         />
         {categoryName && <span className="admin-name-category">{categoryName}</span>}
       </td>
@@ -491,8 +496,8 @@ function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCrea
             <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required autoFocus />
           </label>
           <label>
-            <span>{text.nameEn}</span>
-            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" />
+            <span>{text.nameEn} · {text.optional}</span>
+            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} dir="ltr" />
           </label>
           <label>
             <span>{text.price}</span>
@@ -530,6 +535,11 @@ function AddProductDialog({ open, categories, defaultCategoryId, onClose, onCrea
  * (menu_products.category_id is ON DELETE RESTRICT), and that is the right answer: a section
  * should not be something thirty products can be lost to by one mis-click. Hiding is the move
  * for "take this off the site", and it leaves every product exactly where it is.
+ *
+ * A category carrying a homepage tile is off limits too, and that one the database does not
+ * catch. Tea is empty precisely because its products moved into hot drinks — the row is still
+ * there to keep its tile on the homepage, so the one category the button would happily delete
+ * is the one deleting costs something.
  */
 function CategoryRow({ category, onChange, onRemove, drag }) {
   const [published, setPublished] = useState(category.is_published)
@@ -544,6 +554,7 @@ function CategoryRow({ category, onChange, onRemove, drag }) {
   useEffect(() => { setPublished(category.is_published) }, [category.is_published])
 
   const productCount = category.products.length
+  const carriesHomeTile = Boolean(category.homepage_image_url)
 
   const field = (name, label, options) => (
     <label>
@@ -566,7 +577,7 @@ function CategoryRow({ category, onChange, onRemove, drag }) {
 
       <div className="admin-category__fields">
         {field('name_ar', text.nameAr, { required: true })}
-        {field('name_en', text.nameEn, { required: true, ltr: true })}
+        {field('name_en', text.nameEn, { ltr: true })}
         {field('subtitle_ar', text.subtitleAr)}
         {field('subtitle_en', text.subtitleEn, { ltr: true })}
       </div>
@@ -598,8 +609,10 @@ function CategoryRow({ category, onChange, onRemove, drag }) {
         <button
           type="button"
           className="admin-icon-button"
-          disabled={productCount > 0}
-          title={productCount > 0 ? text.categoryHasProducts : text.removeCategory}
+          disabled={productCount > 0 || carriesHomeTile}
+          title={productCount > 0
+            ? text.categoryHasProducts
+            : carriesHomeTile ? text.categoryHasHomeTile : text.removeCategory}
           aria-label={`${text.removeCategory} — ${category.name_ar}`}
           onClick={() => {
             if (window.confirm(text.confirmRemoveCategory(category.name_ar))) {
@@ -675,8 +688,8 @@ function ManageCategoriesDialog({ open, categories, onClose, onChange, onRemove,
             <input value={nameAr} onChange={(e) => setNameAr(e.target.value)} required placeholder="المخبوزات" />
           </label>
           <label>
-            <span>{text.nameEn}</span>
-            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required dir="ltr" placeholder="Bakery" />
+            <span>{text.nameEn} · {text.optional}</span>
+            <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} dir="ltr" placeholder="Bakery" />
           </label>
           <button type="submit" disabled={busy}>{busy ? text.saving : text.addCategory}</button>
         </form>

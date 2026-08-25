@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import ArrowIcon from '../components/ArrowIcon'
+import { resolveCategorySlug } from '../lib/content'
 import { scrollWindowTo } from '../lib/scroll'
 import { useContent } from '../hooks/useContent'
 import { useLanguage } from '../hooks/useLanguage'
@@ -18,7 +19,11 @@ function readCategoryFromHash(categories) {
     slug = raw
   }
 
-  return categories.some((category) => category.slug === slug) ? slug : null
+  // A folded category keeps its slug pointing at the section that absorbed it, so links
+  // saved before the fold still open the right tab.
+  const resolved = resolveCategorySlug(slug)
+
+  return categories.some((category) => category.slug === resolved) ? resolved : null
 }
 
 export default function Menu() {
@@ -40,7 +45,7 @@ export default function Menu() {
   )
   const categoryIndex = categories.indexOf(category)
 
-  // Deep links (/menu#tea) open the requested category directly; plain /menu opens the first one.
+  // Deep links (/menu#coffee) open the requested category directly; plain /menu opens the first one.
   useEffect(() => {
     setActiveCategory(readCategoryFromHash(categories) ?? defaultCategory)
   }, [categories, defaultCategory, locationKey])

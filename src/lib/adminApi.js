@@ -10,7 +10,9 @@ import { adminClient, MENU_IMAGE_BUCKET } from './adminClient'
 
 const PRODUCT_FIELDS = 'id,slug,name_ar,name_en,price,image_url,image_width,image_height,sort_order,is_published'
 
-const CATEGORY_FIELDS = 'id,slug,name_ar,name_en,subtitle_ar,subtitle_en,sort_order,is_published'
+// homepage_image_url is not editable here; the delete button reads it to refuse a category whose
+// tile would go with it.
+const CATEGORY_FIELDS = 'id,slug,name_ar,name_en,subtitle_ar,subtitle_en,sort_order,is_published,homepage_image_url'
 
 /** Loads every category with all of its products — hidden categories and hidden products alike. */
 export async function loadMenu() {
@@ -152,7 +154,9 @@ export async function createProduct({ categoryId, nameAr, nameEn, price, file })
       category_id: categoryId,
       slug,
       name_ar: nameAr,
-      name_en: nameEn,
+      // Optional, and stored as null rather than an empty string so the fallback to the Arabic
+      // name has one thing to test for.
+      name_en: nameEn || null,
       price,
       sort_order: (last?.[0]?.sort_order ?? 0) + 10,
       is_published: false,
@@ -213,7 +217,7 @@ export async function createCategory({ nameAr, nameEn, subtitleAr, subtitleEn })
     .insert({
       slug,
       name_ar: nameAr,
-      name_en: nameEn,
+      name_en: nameEn || null,
       subtitle_ar: subtitleAr || null,
       subtitle_en: subtitleEn || null,
       sort_order: (last?.[0]?.sort_order ?? 0) + 10,

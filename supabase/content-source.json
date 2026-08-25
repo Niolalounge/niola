@@ -14,7 +14,7 @@
     "duplicateProductSlugs": [],
     "measurementCorrections": [
       {
-        "item": "tea/red-tea-pot",
+        "item": "hot-drinks/red-tea-pot",
         "declaredInSource": "1402x1122",
         "measured": "1400x1123"
       }
@@ -659,125 +659,7 @@
         "en": "Tea"
       },
       "homepage_sort_order": 2,
-      "products": [
-        {
-          "slug": "koshary-tea",
-          "name": {
-            "ar": "شاي كشري",
-            "en": "Koshary Tea"
-          },
-          "price": 45,
-          "image_url": null,
-          "image_width": null,
-          "image_height": null,
-          "sort_order": 0,
-          "is_published": false
-        },
-        {
-          "slug": "lipton-tea",
-          "name": {
-            "ar": "شاي ليبتون",
-            "en": "Lipton Tea"
-          },
-          "price": 45,
-          "image_url": "/images/tea/liption tea.png",
-          "image_width": 1402,
-          "image_height": 1122,
-          "sort_order": 1,
-          "is_published": true
-        },
-        {
-          "slug": "mint-tea",
-          "name": {
-            "ar": "شاي نعناع",
-            "en": "Mint Tea"
-          },
-          "price": 45,
-          "image_url": "/images/tea/mint tea.png",
-          "image_width": 1402,
-          "image_height": 1122,
-          "sort_order": 2,
-          "is_published": true
-        },
-        {
-          "slug": "green-tea",
-          "name": {
-            "ar": "شاي أخضر",
-            "en": "Green Tea"
-          },
-          "price": 50,
-          "image_url": "/images/tea/green tea.png",
-          "image_width": 1402,
-          "image_height": 1122,
-          "sort_order": 3,
-          "is_published": true
-        },
-        {
-          "slug": "karak-tea",
-          "name": {
-            "ar": "شاي كرك",
-            "en": "Karak Tea"
-          },
-          "price": 70,
-          "image_url": "/images/tea/krak tea.png",
-          "image_width": 1402,
-          "image_height": 1122,
-          "sort_order": 4,
-          "is_published": true
-        },
-        {
-          "slug": "lemon-ginger-tea",
-          "name": {
-            "ar": "شاي ليمون مع زنجبيل",
-            "en": "Lemon Ginger Tea"
-          },
-          "price": 55,
-          "image_url": "/images/tea/lemon and ginger tea.png",
-          "image_width": 1402,
-          "image_height": 1122,
-          "sort_order": 5,
-          "is_published": true
-        },
-        {
-          "slug": "lemon-tea",
-          "name": {
-            "ar": "شاي ليمون",
-            "en": "Lemon Tea"
-          },
-          "price": 55,
-          "image_url": null,
-          "image_width": null,
-          "image_height": null,
-          "sort_order": 6,
-          "is_published": false
-        },
-        {
-          "slug": "red-tea-pot",
-          "name": {
-            "ar": "براد شاي أحمر",
-            "en": "Red Tea Pot"
-          },
-          "price": 150,
-          "image_url": "/images/tea/red tea.png",
-          "image_width": 1400,
-          "image_height": 1123,
-          "sort_order": 7,
-          "is_published": false
-        },
-        {
-          "slug": "karak-tea-pot",
-          "name": {
-            "ar": "براد شاي كرك",
-            "en": "Karak Tea Pot"
-          },
-          "price": 200,
-          "image_url": null,
-          "image_width": null,
-          "image_height": null,
-          "sort_order": 8,
-          "is_published": false
-        }
-      ]
+      "products": []
     },
     {
       "slug": "coffee",
@@ -1429,6 +1311,123 @@
       "homepage_sort_order": 7,
       "products": [
         {
+          "slug": "koshary-tea",
+          "name": {
+            "ar": "شاي كشري",
+            "en": "Koshary Tea"
+          },
+          "price": 45,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 0,
+          "is_published": false
+        },
+        {
+          "slug": "lipton-tea",
+          "name": {
+            "ar": "شاي ليبتون",
+            "en": "Lipton Tea"
+          },
+          "price": 45,
+          "image_url": "/images/tea/liption tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 1,
+          "is_published": true
+        },
+        {
+          "slug": "mint-tea",
+          "name": {
+            "ar": "شاي نعناع",
+            "en": "Mint Tea"
+          },
+          "price": 45,
+          "image_url": "/images/tea/mint tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 2,
+          "is_published": true
+        },
+        {
+          "slug": "green-tea",
+          "name": {
+            "ar": "شاي أخضر",
+            "en": "Green Tea"
+          },
+          "price": 50,
+          "image_url": "/images/tea/green tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 3,
+          "is_published": true
+        },
+        {
+          "slug": "karak-tea",
+          "name": {
+            "ar": "شاي كرك",
+            "en": "Karak Tea"
+          },
+          "price": 70,
+          "image_url": "/images/tea/krak tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 4,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-ginger-tea",
+          "name": {
+            "ar": "شاي ليمون مع زنجبيل",
+            "en": "Lemon Ginger Tea"
+          },
+          "price": 55,
+          "image_url": "/images/tea/lemon and ginger tea.png",
+          "image_width": 1402,
+          "image_height": 1122,
+          "sort_order": 5,
+          "is_published": true
+        },
+        {
+          "slug": "lemon-tea",
+          "name": {
+            "ar": "شاي ليمون",
+            "en": "Lemon Tea"
+          },
+          "price": 55,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 6,
+          "is_published": false
+        },
+        {
+          "slug": "red-tea-pot",
+          "name": {
+            "ar": "براد شاي أحمر",
+            "en": "Red Tea Pot"
+          },
+          "price": 150,
+          "image_url": "/images/tea/red tea.png",
+          "image_width": 1400,
+          "image_height": 1123,
+          "sort_order": 7,
+          "is_published": false
+        },
+        {
+          "slug": "karak-tea-pot",
+          "name": {
+            "ar": "براد شاي كرك",
+            "en": "Karak Tea Pot"
+          },
+          "price": 200,
+          "image_url": null,
+          "image_width": null,
+          "image_height": null,
+          "sort_order": 8,
+          "is_published": false
+        },
+        {
           "slug": "hot-cider",
           "name": {
             "ar": "هوت سيدر",
@@ -1438,7 +1437,7 @@
           "image_url": "/images/hot drinks/Hot Cider.png",
           "image_width": 1254,
           "image_height": 1254,
-          "sort_order": 0,
+          "sort_order": 9,
           "is_published": true
         },
         {
@@ -1451,7 +1450,7 @@
           "image_url": "/images/hot drinks/Hot Chocolate.png",
           "image_width": 1402,
           "image_height": 1122,
-          "sort_order": 1,
+          "sort_order": 10,
           "is_published": true
         },
         {
@@ -1464,7 +1463,7 @@
           "image_url": "/images/hot drinks/Hot Tiramisu.png",
           "image_width": 1448,
           "image_height": 1086,
-          "sort_order": 2,
+          "sort_order": 11,
           "is_published": true
         },
         {
@@ -1477,7 +1476,7 @@
           "image_url": "/images/hot drinks/Anise.png",
           "image_width": 1254,
           "image_height": 1254,
-          "sort_order": 3,
+          "sort_order": 12,
           "is_published": true
         },
         {
@@ -1490,7 +1489,7 @@
           "image_url": "/images/hot drinks/Sahlab.png",
           "image_width": 1254,
           "image_height": 1254,
-          "sort_order": 4,
+          "sort_order": 13,
           "is_published": true
         },
         {
@@ -1503,7 +1502,7 @@
           "image_url": "/images/hot drinks/Special Sahlab.png",
           "image_width": 1254,
           "image_height": 1254,
-          "sort_order": 5,
+          "sort_order": 14,
           "is_published": true
         }
       ]

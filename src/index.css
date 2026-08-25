@@ -1323,7 +1323,6 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
 .menu-section[data-category='iced-drinks'],
 .menu-section[data-category='fresh-juices'],
 .menu-section[data-category='milkshakes'] { --product-media-ratio: 4 / 5; }
-.menu-section[data-category='tea'] { --product-media-ratio: 5 / 4; }
 .menu-section[data-category='desserts'],
 .menu-section[data-category='smoothies'] { --product-media-ratio: 4 / 3; }
 .menu-section__header {

@@ -59,7 +59,7 @@ export default function MenuCategories() {
           {homeTiles.map((category, index) => (
             <Link
               key={category.slug}
-              to={`/menu#${category.slug}`}
+              to={`/menu#${category.target}`}
               className="category-card"
               style={{ '--category-index': index }}
             >

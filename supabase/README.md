@@ -8,12 +8,18 @@ menu.
 
 | Table | Holds |
 | --- | --- |
-| `menu_categories` | The 10 menu sections, their bilingual name and subtitle, their order, and the homepage tile fields |
+| `menu_categories` | 10 rows — 9 menu sections plus the folded `tea` row, their bilingual name and subtitle, their order, and the homepage tile fields |
 | `menu_products` | All 115 items with bilingual names, price in EGP, image path and measured dimensions |
 | `gallery_items` | The 6 gallery photographs with bilingual label and alt text |
 
 Everything user-visible is stored as a pair of columns — `name_ar` / `name_en` — and the site
 picks one by the active language.
+
+`name_en` is optional, on products and on categories alike. Not everything Niola serves has an
+English name anyone has settled on, and a form that insists on one gets a translation invented at
+the keyboard. Where it is missing the site shows the Arabic name to English visitors — the item
+under a name it actually has, rather than a card with nothing written on it. `name_ar` stays
+required: a product needs at least one name.
 
 ## Editing content
 
@@ -38,6 +44,8 @@ learn about a price change a few times a week is a bad trade — one 150-byte re
 `/admin` dashboard, which already loads the library to sign in, does use the websocket, so two
 administrators see each other's edits immediately.
 
+- **Name it in Arabic only** — leave `name_en` blank and the English site falls back to the
+  Arabic name. Filling it in later changes nothing else; the slug never moves.
 - **Hide an item** — set `is_published = false`. It stays in the table with its price.
 - **Publish an item** — it needs `image_url`, `image_width` and `image_height` first. A constraint
   enforces this, because a card without them shifts the layout while the photo loads.
@@ -49,6 +57,12 @@ administrators see each other's edits immediately.
   fetchable.
 - **Delete a category** — move or delete its products first. The foreign key is `ON DELETE
   RESTRICT`, so the database refuses rather than silently taking 30 products with it.
+- **`tea` is not a section any more.** 0008 folded its nine products into `hot-drinks`, where
+  they sit at the top of the list. The row stays behind, empty and published, because it holds
+  the homepage tile with the karak photograph — `CATEGORY_ALIASES` in `src/lib/content.js`
+  points that tile, and every `/menu#tea` link saved before the fold, at `hot-drinks`. It is
+  the one empty category the dashboard must not be allowed to delete: deleting it takes the
+  tile with it and the homepage drops to eight.
 
 Before 0007, every product added through the dashboard kept the column default of `sort_order =
 0`; twenty of them ended up tied, and rows that tie come back from Postgres in whatever order it
@@ -80,6 +94,8 @@ PostgREST reads and writes rows but has no `CREATE TABLE`.
 | `migrations/0005_realtime.sql` | `content_revision` and the triggers that drive live updates |
 | `migrations/0006_manage_categories.sql` | Lets administrators add, rename, hide and delete categories |
 | `migrations/0007_ordering.sql` | `reorder_*` functions, and one-off numbering for rows that tied |
+| `migrations/0008_fold_tea_into_hot_drinks.sql` | Moves the tea products into `hot-drinks`, ahead of the hot cider |
+| `migrations/0009_optional_english_name.sql` | Drops `not null` from `name_en` on products and categories |
 
 ## Regenerating the seed after editing `src/data`
 
@@ -131,9 +147,12 @@ is visible. Escape, the backdrop and the close button all dismiss it.
 
 **إدارة التصنيفات**, under the sidebar, opens the sections themselves: add one, rename any of the
 four names in place, hide one, delete an empty one. Names save on blur, the way a price does.
+Delete stays disabled on `tea`, which is empty but holds a homepage tile — the button says so.
 
 **Editing a product** happens in the row itself: both names and the price save on blur, and the
-visibility switch answers the click immediately. The name fields are deliberately borderless
+visibility switch answers the click immediately. The English name may be left empty — clearing it
+stores a null, and the site reads the Arabic name in its place. Clearing the Arabic one puts the
+stored value back, because the database will not take the write. The name fields are deliberately borderless
 until hovered — the table is read far more often than it is edited, and 26 rows of visible form
 controls stop reading as a menu. Renaming never touches the slug, so /menu links keep working.
 
@@ -168,14 +187,16 @@ is not editable from the dashboard yet.
 
 A few things follow from the schema rather than from the page:
 
-- **Renaming is always safe.** The slug is the public identifier — `/menu#tea` and every link
-  anyone has saved point at it — and renaming never touches it.
+- **Renaming is always safe.** The slug is the public identifier — `/menu#coffee` and every
+  link anyone has saved point at it — and renaming never touches it.
 - **A new category is invisible until it has a published product**, because `fetchMenu` drops
   empty categories rather than rendering a section with a "00" count.
 - **A new category's product images render 1:1** until `src/index.css` gets a
   `.menu-section[data-category='<slug>']` ratio for it. See *Known coupling to CSS* below.
-- **Delete is only offered on an empty category**, matching `ON DELETE RESTRICT`. Hiding is the
-  answer for everything else, and it keeps every product and every price.
+- **Delete is only offered on an empty category** that carries no homepage tile. The first half
+  matches `ON DELETE RESTRICT`; the second is the dashboard’s own rule, since nothing in the
+  schema stops a tile being deleted along with the row holding it. Hiding is the answer for
+  everything else, and it keeps every product and every price.
 
 Access is a row in `admin_users`, not a claim inside the login token, so removing someone takes
 effect on their next request rather than whenever their session expires.

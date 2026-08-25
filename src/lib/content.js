@@ -14,7 +14,7 @@ import {
  * One shape for the menu and the gallery, whichever source they came from.
  *
  *   category    { slug, name, subtitle, products: [{ slug, name, price, image, imageWidth, imageHeight }] }
- *   homeTile    { slug, name, subtitle, image }
+ *   homeTile    { slug, target, name, subtitle, image }
  *   galleryItem { key, layout, src, width, height, objectPosition, label, alt }
  *
  * Every user-visible string is a `{ ar, en }` pair, so components index it with the active
@@ -25,6 +25,29 @@ import {
  */
 
 const pair = (row, field) => ({ ar: row[`${field}_ar`], en: row[`${field}_en`] })
+
+/**
+ * A name in both languages, where only the Arabic one is guaranteed.
+ *
+ * The English name is optional in the dashboard, because plenty of what Niola serves has only
+ * ever been written in Arabic. An English visitor is then shown the Arabic name — the item under
+ * a name it actually has, rather than a card with nothing written on it.
+ */
+const namePair = (row, field) => {
+  const ar = row[`${field}_ar`]
+  return { ar, en: row[`${field}_en`] || ar }
+}
+
+/**
+ * Categories that were folded into another one, as slug -> the section that absorbed them.
+ *
+ * Tea is now the top of hot drinks. The slug still has to lead somewhere: it carries a
+ * homepage tile of its own, and /menu#tea is in every link anyone has saved since the menu
+ * went online. Both resolve through here rather than 404ing into the first category.
+ */
+export const CATEGORY_ALIASES = { tea: 'hot-drinks' }
+
+export const resolveCategorySlug = (slug) => CATEGORY_ALIASES[slug] ?? slug
 
 // ---------------------------------------------------------------------------
 // Supabase
@@ -45,13 +68,13 @@ const GALLERY_SELECT = [
 
 const toCategory = (row) => ({
   slug: row.slug,
-  name: pair(row, 'name'),
+  name: namePair(row, 'name'),
   subtitle: pair(row, 'subtitle'),
   products: [...(row.menu_products ?? [])]
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((product) => ({
       slug: product.slug,
-      name: pair(product, 'name'),
+      name: namePair(product, 'name'),
       price: product.price,
       image: product.image_url,
       imageWidth: product.image_width ?? row.default_image_width,
@@ -61,11 +84,13 @@ const toCategory = (row) => ({
 
 const toHomeTile = (row) => ({
   slug: row.slug,
+  // Where the tile leads, which is the row itself unless the category was folded into another.
+  target: resolveCategorySlug(row.slug),
   // A tile may carry its own label — the homepage says "Iced Coffee" where the menu says
   // "Iced Drinks" — and falls back to the category name when it does not.
   name: row.homepage_name_ar
-    ? { ar: row.homepage_name_ar, en: row.homepage_name_en }
-    : pair(row, 'name'),
+    ? { ar: row.homepage_name_ar, en: row.homepage_name_en || row.homepage_name_ar }
+    : namePair(row, 'name'),
   subtitle: pair(row, 'subtitle'),
   image: row.homepage_image_url,
 })
@@ -97,10 +122,12 @@ export async function fetchMenu() {
   return {
     categories,
     homeTiles: data
-      // A tile links to /menu#<slug>. Dropping the last visible product from a category — which
-      // happens whenever a photo is pulled, since a product needs one to be published — would
-      // otherwise leave a tile pointing at a section that no longer exists.
-      .filter((row) => row.homepage_sort_order !== null && row.homepage_image_url && visible.has(row.slug))
+      // A tile links to the section it resolves to. Dropping the last visible product from a
+      // category — which happens whenever a photo is pulled, since a product needs one to be
+      // published — would otherwise leave a tile pointing at a section that no longer exists.
+      // A folded category has no products of its own, so it is judged by what absorbed it.
+      .filter((row) => row.homepage_sort_order !== null && row.homepage_image_url
+        && visible.has(resolveCategorySlug(row.slug)))
       .sort((a, b) => a.homepage_sort_order - b.homepage_sort_order)
       .map(toHomeTile),
   }
@@ -161,6 +188,7 @@ const staticCategories = categoryOrder
 
 const staticHomeTiles = homepageCategories.map((category) => ({
   slug: category.slug,
+  target: resolveCategorySlug(category.slug),
   name: category.name,
   subtitle: subtitleFor(category.slug),
   image: category.image,

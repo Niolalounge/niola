@@ -63,19 +63,12 @@ export const menuCategories = [
     ],
   },
   {
+    // Folded into hot drinks: the products below moved into that category, and the row is kept
+    // only so the homepage keeps its tea tile. A category with no products renders no menu
+    // section, and CATEGORY_ALIASES in src/lib/content.js points the tile at hot drinks.
     slug: 'tea',
     name: { ar: 'الشاي', en: 'Tea' },
-    products: [
-      product('koshary-tea', 'شاي كشري', 'Koshary Tea', 45),
-      product('lipton-tea', 'شاي ليبتون', 'Lipton Tea', 45, '/images/tea/liption tea.png'),
-      product('mint-tea', 'شاي نعناع', 'Mint Tea', 45, '/images/tea/mint tea.png'),
-      product('green-tea', 'شاي أخضر', 'Green Tea', 50, '/images/tea/green tea.png'),
-      product('karak-tea', 'شاي كرك', 'Karak Tea', 70, '/images/tea/krak tea.png'),
-      product('lemon-ginger-tea', 'شاي ليمون مع زنجبيل', 'Lemon Ginger Tea', 55, '/images/tea/lemon and ginger tea.png'),
-      product('lemon-tea', 'شاي ليمون', 'Lemon Tea', 55),
-      product('red-tea-pot', 'براد شاي أحمر', 'Red Tea Pot', 150, '/images/tea/red tea.png'),
-      product('karak-tea-pot', 'براد شاي كرك', 'Karak Tea Pot', 200),
-    ],
+    products: [],
   },
   {
     slug: 'coffee',
@@ -142,6 +135,15 @@ export const menuCategories = [
     slug: 'hot-drinks',
     name: { ar: 'المشروبات الساخنة', en: 'Hot Drinks' },
     products: [
+      product('koshary-tea', 'شاي كشري', 'Koshary Tea', 45),
+      product('lipton-tea', 'شاي ليبتون', 'Lipton Tea', 45, '/images/tea/liption tea.png'),
+      product('mint-tea', 'شاي نعناع', 'Mint Tea', 45, '/images/tea/mint tea.png'),
+      product('green-tea', 'شاي أخضر', 'Green Tea', 50, '/images/tea/green tea.png'),
+      product('karak-tea', 'شاي كرك', 'Karak Tea', 70, '/images/tea/krak tea.png'),
+      product('lemon-ginger-tea', 'شاي ليمون مع زنجبيل', 'Lemon Ginger Tea', 55, '/images/tea/lemon and ginger tea.png'),
+      product('lemon-tea', 'شاي ليمون', 'Lemon Tea', 55),
+      product('red-tea-pot', 'براد شاي أحمر', 'Red Tea Pot', 150, '/images/tea/red tea.png'),
+      product('karak-tea-pot', 'براد شاي كرك', 'Karak Tea Pot', 200),
       product('hot-cider', 'هوت سيدر', 'Hot Cider', 80, '/images/hot drinks/Hot Cider.png'),
       product('hot-chocolate', 'هوت شوكليت', 'Hot Chocolate', 130, '/images/hot drinks/Hot Chocolate.png'),
       product('hot-tiramisu', 'هوت تيراميسو', 'Hot Tiramisu', 150, '/images/hot drinks/Hot Tiramisu.png'),
