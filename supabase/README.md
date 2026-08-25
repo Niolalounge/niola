@@ -144,9 +144,12 @@ categories in that dialog. Some notes on how it works, since none of it is the o
 - The drag starts on the grip and nowhere else, so a finger anywhere else on a row still scrolls.
   `touch-action: none` on the grip is load-bearing: without it the browser claims the gesture and
   no `pointermove` is ever delivered.
-- Nothing reorders until you let go. The row follows the finger, a line shows where it will land,
-  and the list is spliced once — reordering live would move the ground under the measurement that
-  decides where to reorder to.
+- The list parts as you carry a row over it: every row the drag has passed slides up or down by
+  one slot, so the gap under your finger is the place the row will take. The array itself is not
+  touched until you let go, and it is spliced once.
+- Where it lands is measured against the list as it would sit with nothing moved — each row is
+  read back through whatever transform it is currently carrying. Hit-testing the rows where they
+  have just slid to would put the ground in motion under the measurement that moves it.
 - The grip is a button, so **arrow keys move a row** without a pointer.
 - Dragging is off while a search or a filter is on, and the panel says so. What you can see then
   is a subset, and dropping row 3 of 5 visible rows says nothing about where it belongs among the

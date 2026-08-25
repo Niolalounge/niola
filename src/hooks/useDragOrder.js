@@ -1,6 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
+ * Where a row sits with its own transform taken back off — its place in the list as the list
+ * would look with nothing being dragged.
+ *
+ * getComputedStyle reports a transition’s current value rather than its target, so this stays
+ * honest while the rows are still sliding into place.
+ */
+function untransformed(element) {
+  const rect = element.getBoundingClientRect()
+  const transform = getComputedStyle(element).transform
+  const shift = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m42
+
+  return { top: rect.top - shift, height: rect.height }
+}
+
+// The rows that part are settling, not tracking a finger, so they are the one thing here that
+// should be eased rather than pinned.
+const PART = 'transform 150ms cubic-bezier(0.22, 1, 0.36, 1)'
+
+/**
  * Reordering a vertical list by dragging, without a library.
  *
  * Pointer Events rather than the HTML5 drag-and-drop API: that API never fires on touch, and this
@@ -8,9 +27,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
  * nowhere else, so a finger laid anywhere on a row still scrolls the page — a whole-row drag
  * would have to fight the scroll for every gesture and lose one of them.
  *
- * Nothing in the list moves while the pointer is down. The dragged row follows the finger and a
- * line marks where it would land; the array is spliced once, on release. Reordering live would
- * mean the ground moving under the measurement that decides where to reorder to.
+ * The list parts as the row is carried over it: every row the drag has passed slides up or down
+ * by one slot, so the gap under the finger is the place the row will take. That is presentation
+ * only — the array is still spliced once, on release.
+ *
+ * What decides where it lands is measured against the list as it would sit untransformed, never
+ * against the rows as they have just been moved. Hit-testing the moved rows would put the
+ * ground in motion under the measurement that moves it.
  *
  * The handle is a real button, so the same move is available from the keyboard with the arrow
  * keys — dragging is unreachable without a pointer, and the dashboard should not be either.
@@ -39,8 +62,8 @@ export function useDragOrder({ ids, onCommit, disabled = false }) {
       if (id === exceptId) continue
       const element = rowsRef.current.get(id)
       if (!element) continue
-      const rect = element.getBoundingClientRect()
-      rows.push({ id, middle: rect.top + rect.height / 2 })
+      const { top, height } = untransformed(element)
+      rows.push({ id, element, middle: top + height / 2 })
     }
     return rows
   }, [])
@@ -51,10 +74,12 @@ export function useDragOrder({ ids, onCommit, disabled = false }) {
     if (!state) return
 
     cancelAnimationFrame(state.frame)
-    const element = rowsRef.current.get(state.id)
-    if (element) {
-      element.style.transform = ''
-      element.style.transition = ''
+    // Every row, not just the one that was held: the rest are parted around a gap that is about
+    // to stop existing. Cleared without a transition, because the list re-renders in its new
+    // order in the same tick and animating a row back to a place it is leaving reads as a glitch.
+    for (const row of rowsRef.current.values()) {
+      row.style.transform = ''
+      row.style.transition = ''
     }
 
     setDragId(null)
@@ -74,16 +99,39 @@ export function useDragOrder({ ids, onCommit, disabled = false }) {
     const state = stateRef.current
     if (!state) return
 
+    // The whole list is read before any of it is written. A getBoundingClientRect after a style
+    // change makes the browser lay the list out again to answer it, and interleaving the two
+    // costs one full layout per row, every frame.
     const element = rowsRef.current.get(state.id)
+    const slotTop = element ? untransformed(element).top : 0
+    const rows = measure(state.id)
+
+    let index = rows.findIndex((row) => state.pointerY < row.middle)
+    if (index === -1) index = rows.length
+
     if (element) {
-      const slotTop = element.getBoundingClientRect().top - state.offset
-      state.offset += (state.pointerY - state.grab) - slotTop
+      // slotTop is where the row would sit untouched, so the difference is the whole offset it
+      // needs — an assignment. Adding it re-applied the entire displacement on every frame, and
+      // since autoScroll runs update() ~60 times a second the row shot off the list with the
+      // finger standing still.
+      state.offset = (state.pointerY - state.grab) - slotTop
       element.style.transform = `translateY(${state.offset}px)`
     }
 
-    const rows = measure(state.id)
-    let index = rows.findIndex((row) => state.pointerY < row.middle)
-    if (index === -1) index = rows.length
+    // rows is the list with the held row taken out, which is the same list `index` counts into:
+    // everything between where it left and where it would land closes up by exactly the slot it
+    // vacated, and the gap that leaves is the answer to "where am I".
+    const from = idsRef.current.indexOf(state.id)
+    for (const [position, row] of rows.entries()) {
+      let shift = 0
+      if (position >= from && position < index) shift = -state.slot
+      else if (position >= index && position < from) shift = state.slot
+
+      if (state.shifts.get(row.id) === shift) continue
+      state.shifts.set(row.id, shift)
+      row.element.style.transform = shift ? `translateY(${shift}px)` : ''
+    }
+
     if (index !== state.dropIndex) {
       state.dropIndex = index
       setDropIndex(index)
@@ -128,6 +176,26 @@ export function useDragOrder({ ids, onCommit, disabled = false }) {
     return window
   }
 
+  /**
+   * How far the rest of the list closes up when this row is lifted out of it: the row’s own
+   * height plus whatever separates it from its neighbour. Measured rather than assumed — the
+   * products table runs its rows flush and the category list spaces them out, and which is which
+   * is not this hook’s business.
+   */
+  const slotHeight = useCallback((id) => {
+    const index = idsRef.current.indexOf(id)
+    const self = rowsRef.current.get(id)?.getBoundingClientRect()
+    if (!self) return 0
+
+    const next = rowsRef.current.get(idsRef.current[index + 1])?.getBoundingClientRect()
+    if (next) return next.top - self.top
+
+    const previous = rowsRef.current.get(idsRef.current[index - 1])?.getBoundingClientRect()
+    if (previous) return self.height + (self.top - previous.bottom)
+
+    return self.height
+  }, [])
+
   const onPointerDown = useCallback((event, id) => {
     if (disabled || event.button > 0) return
     const element = rowsRef.current.get(id)
@@ -145,16 +213,24 @@ export function useDragOrder({ ids, onCommit, disabled = false }) {
       grab: event.clientY - rect.top,
       offset: 0,
       dropIndex: idsRef.current.indexOf(id),
+      slot: slotHeight(id),
+      // What each of the other rows has been moved by, so a frame that changes nothing writes
+      // nothing — an unchanged transform would still be a style write on every row, every frame.
+      shifts: new Map(),
       scroller: findScroller(element),
       frame: 0,
     }
-    // Transitions belong to the settling, not the dragging; leaving one on lags the finger.
-    element.style.transition = 'none'
+
+    for (const [rowId, row] of rowsRef.current) {
+      // The row under the finger has to be pinned to it; a transition on that one is lag. The
+      // rows it displaces are the opposite case — they are settling, and should be seen to.
+      row.style.transition = rowId === id ? 'none' : PART
+    }
 
     setDragId(id)
     setDropIndex(stateRef.current.dropIndex)
     stateRef.current.frame = requestAnimationFrame(autoScroll)
-  }, [disabled, autoScroll])
+  }, [disabled, autoScroll, slotHeight])
 
   const onPointerMove = useCallback((event) => {
     const state = stateRef.current
