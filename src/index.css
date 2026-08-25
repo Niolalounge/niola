@@ -984,6 +984,39 @@ section, #gallery, #shisha, #location, #contact { scroll-margin-top: calc(var(--
 .footer__bottom a { color: rgba(216, 179, 106, 0.82); transition: color 250ms ease; }
 .footer__bottom a:hover { color: var(--champagne-gold); }
 
+/* The studio credit is the one thing in this bar meant to be noticed. A flex row rather than a
+   run of text, so the prefix sits before the name in both directions without a bidi mark. */
+.footer__credit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+.footer__credit-prefix { font-size: 0.68rem; letter-spacing: 0.02em; }
+
+/* Outweighs the muted .footer__bottom a above on specificity. */
+.footer__bottom .footer__credit-link {
+  position: relative;
+  padding-block-end: 3px;
+  color: var(--champagne-gold);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+/* An underline of its own: text-decoration sits too close under a letter-spaced word, and
+   thickening it on hover would shift the baseline. */
+.footer__bottom .footer__credit-link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  transition: opacity 250ms ease, height 250ms ease;
+}
+.footer__bottom .footer__credit-link:hover { color: var(--warm-ivory); }
+.footer__bottom .footer__credit-link:hover::after { opacity: 1; height: 2px; }
+
 /* ---------- Gallery ---------- */
 .gallery-page { background: var(--warm-ivory); }
 .gallery-intro {

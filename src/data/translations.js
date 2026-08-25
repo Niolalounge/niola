@@ -196,7 +196,7 @@ export const translations = {
       rights: 'جميع الحقوق محفوظة.',
       creditPrefix: 'تصميم وتطوير',
       creditName: 'ArtiCode',
-      creditLabel: 'تواصل مع ArtiCode عبر واتساب',
+      creditLabel: 'زيارة موقع ArtiCode',
     },
 
     a11y: {
@@ -412,7 +412,7 @@ export const translations = {
       rights: 'All rights reserved.',
       creditPrefix: 'Designed & Developed by',
       creditName: 'ArtiCode',
-      creditLabel: 'Contact ArtiCode on WhatsApp',
+      creditLabel: 'Visit the ArtiCode website',
     },
 
     a11y: {

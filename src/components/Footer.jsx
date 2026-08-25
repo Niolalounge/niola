@@ -32,10 +32,11 @@ export default function Footer() {
       </div>
       <div className="shell footer__bottom">
         <p>{copy.footer.copyright} · {copy.footer.rights}</p>
-        <p>
-          {copy.footer.creditPrefix}{' '}
+        <p className="footer__credit">
+          <span className="footer__credit-prefix">{copy.footer.creditPrefix}</span>
           <a
-            href="https://wa.me/905352973229"
+            className="footer__credit-link"
+            href="https://articode.com.tr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label={copy.footer.creditLabel}
