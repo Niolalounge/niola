@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '../admin.css'
-import { adminClient } from '../lib/adminClient'
+import { adminClient, isRememberingSession, rememberSession } from '../lib/adminClient'
 import { useDragOrder } from '../hooks/useDragOrder'
 import {
   createCategory,
@@ -20,6 +20,8 @@ const text = {
   title: 'إدارة المنيو',
   signIn: 'تسجيل الدخول',
   signOut: 'خروج',
+  remember: 'تذكّرني على هذا الجهاز',
+  rememberHint: 'اتركه بدون تحديد على جهاز مشترك — الجلسة تنتهي بإغلاق المتصفح.',
   email: 'البريد الإلكتروني',
   password: 'كلمة المرور',
   signingIn: 'جارٍ الدخول…',
@@ -239,6 +241,8 @@ function useSignedInAdmin() {
 function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  // Opens on the answer it was left on, so the choice is made once rather than every visit.
+  const [remember, setRemember] = useState(isRememberingSession)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
@@ -246,6 +250,9 @@ function SignIn() {
     event.preventDefault()
     setBusy(true)
     setError(null)
+    // Before the sign-in, not after: signing in is the write that puts the session in a store,
+    // and this is what decides which one.
+    rememberSession(remember)
     const { error: cause } = await adminClient.auth.signInWithPassword({ email, password })
     if (cause) setError(cause.message)
     setBusy(false)
@@ -263,6 +270,11 @@ function SignIn() {
         <span>{text.password}</span>
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" dir="ltr" />
       </label>
+      <label className="admin-signin__remember">
+        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+        <span>{text.remember}</span>
+      </label>
+      {!remember && <p className="admin-signin__note">{text.rememberHint}</p>}
       {error && <p className="admin-error">{error}</p>}
       <button type="submit" disabled={busy}>{busy ? text.signingIn : text.signIn}</button>
     </form>

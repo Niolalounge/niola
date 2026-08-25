@@ -98,6 +98,21 @@
 .admin-signin h1 { font-family: var(--display-font); font-size: 1.4rem; margin: 0 0 0.4rem; }
 .admin-signin label { display: grid; gap: 0.35rem; }
 .admin-signin span { font-size: 0.75rem; color: var(--latte-sand); }
+/* The one control here that is a choice rather than a field, so it reads as a line, not a row
+   in the form above it. */
+.admin-signin__remember {
+  grid-auto-flow: column;
+  justify-content: start;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+}
+.admin-signin__remember input {
+  width: 1rem; height: 1rem;
+  accent-color: var(--champagne-gold);
+  cursor: pointer;
+}
+.admin-signin__note { margin: -0.4rem 0 0; font-size: 0.7rem; line-height: 1.6; color: var(--latte-sand); opacity: 0.75; }
 
 /* ---- header ---- */
 

@@ -132,6 +132,18 @@ SUPABASE_SERVICE_ROLE_KEY=<secret> \
 `/admin` on the site itself. Sign in with the email and password of an account listed in
 `admin_users`, and you can edit prices, add products with a photograph, and hide or show items.
 
+**تذكّرني** decides where the session is kept, and is ticked by default. Ticked, it goes to
+localStorage and outlives the browser closing, so the dashboard opens straight onto the menu for
+weeks at a time — Supabase refreshes the hour-long access token from a refresh token that does not
+expire on its own. Unticked, it goes to sessionStorage and leaves with the tab, which is the answer
+on a borrowed machine. The choice itself is remembered, so the box opens the way it was left.
+
+Being asked for the password anyway, with the box ticked, means the stored session is not being
+found — storage is per origin, so `www.` and the bare domain do not share one, and neither does a
+private window or a browser set to clear site data on exit. The other place to look is
+**Authentication → Sessions** in the Supabase dashboard: a time-box or an inactivity timeout set
+there ends sessions on a schedule no amount of remembering survives.
+
 One category is on screen at a time — the sidebar picks it, and 115 rows at once is what made the
 first version unreadable. Above it, four counters (total, visible, hidden, without a photo) and:
 
